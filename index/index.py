@@ -69,7 +69,7 @@ def response_msg():
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
                            content)
       return echostr
-    elif msg['location'] == 'location':
+    elif msg['Content'] == "location":
       echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
                            )
