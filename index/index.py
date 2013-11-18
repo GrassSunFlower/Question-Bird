@@ -52,16 +52,27 @@ def response_msg():
              <Content><![CDATA[%s]]></Content>
              <FuncFlag>0</FuncFlag>
              </xml>"""
+    locationTpl = """<xml>
+             <ToUserName><![CDATA[%s]]></ToUserName>
+             <FromUserName><![CDATA[%s]]></FromUserName>
+             <CreateTime>%s</CreateTime>
+             <MsgType><![CDATA[text]]></MsgType>
+             <Location_X>23.134521</Location_X>
+             <Location_Y>113.358803</Location_Y>
+             <Scale>20</Scale>
+             <Label><![CDATA[location]]></Label>
+             <MsgId>1234567890123456></MsgId>
+             </xml>"""
     content = set_content()
     if msg['Content'] == "hi":
       echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
                            content)
       return echostr
-    else:
+    elif msg['location'] == 'location':
       echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
-                           'please input hi')
+                           )
       return echostr
  
 #call bae serive
