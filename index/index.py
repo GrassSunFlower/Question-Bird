@@ -67,6 +67,7 @@ def response_msg():
     if msg['Content'] == "hi":
       echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
+<<<<<<< HEAD
                            content)
       return echostr
     elif msg['Content'] == "location":
@@ -75,6 +76,21 @@ def response_msg():
                            )
       return echostr
  
+=======
+                           "回复001：使用info用户名和密码登录\n回复002：退出登录")
+        return echostr
+    elif msg['MsgType'] == "text" and msg['Content'] == "hi":
+        echostr = textTpl % (
+                           msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
+                           msg['FromUserName'] + " is a sb")
+        return echostr
+    else:
+        echostr = textTpl % (
+                           msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
+                           'please input hi')
+        return echostr
+
+>>>>>>> 2b4665ee9347ed070c7650d134a3db646749a4a4
 #call bae serive
 from bae.core.wsgi import WSGIApplication
 #create application
