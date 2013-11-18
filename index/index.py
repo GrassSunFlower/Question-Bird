@@ -53,17 +53,22 @@ def response_msg():
              <FuncFlag>0</FuncFlag>
              </xml>"""
     content = set_content()
-    if msg['Content'] == "hi":
-      echostr = textTpl % (
+    if msg['MsgType'] == "event" and msg['Event'] == "subscribe":
+        echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
-                           content)
-      return echostr
+                           "回复001：使用info用户名和密码登录\n回复002：退出登录")
+        return echostr
+    elif msg['MsgType'] == "text" and msg['Content'] == "hi":
+        echostr = textTpl % (
+                           msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
+                           msg['FromUserName'] + " is a sb")
+        return echostr
     else:
-      echostr = textTpl % (
+        echostr = textTpl % (
                            msg['FromUserName'], msg['ToUserName'], str(int(time.time())),
                            'please input hi')
-      return echostr
- 
+        return echostr
+
 #call bae serive
 from bae.core.wsgi import WSGIApplication
 #create application
