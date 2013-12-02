@@ -103,3 +103,9 @@ def test(request):
     now = datetime.datetime.now()
     html = "<html><body>It is now %s.</body></html>" % now
     return HttpResponse(html)
+
+
+def index(request):
+    helloword = "welcome to QuestionBird!"
+    html = "<html><body>%s</body></html>" % helloword
+    return HttpResponse(html)

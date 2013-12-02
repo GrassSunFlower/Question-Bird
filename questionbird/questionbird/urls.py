@@ -11,5 +11,6 @@ urlpatterns = patterns('',
 
     #url(r'^admin/', include(admin.site.urls)),
     (r'^test/$', test),
-    (r'', handleRequest),
+    (r'^micromessage/$', handleRequest),
+    (r'^$', index),
 )
