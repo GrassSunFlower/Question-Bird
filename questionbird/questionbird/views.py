@@ -3,15 +3,13 @@
 __author__ = 'ypxtq'
 
 from django.shortcuts import render
-import hashlib
+import hashlib,urllib2
 import xml.etree.ElementTree as ET
-import urllib2
-import time
-import json
+import time,json,datetime
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import datetime
 from django.utils.encoding import smart_str, smart_unicode
+from questionbird.keys import *
 
 # Create your views here.
 @csrf_exempt
@@ -51,9 +49,9 @@ def checkSignature(request):
 # 解析请求,拆解到一个字典里
 def parse_msg(rootElem):
     msg = {}
-    #if rootElem.tag == 'xml':
-    for child in rootElem:
-        msg[child.tag] = smart_str(child.text)
+    if rootElem.tag == 'xml':
+        for child in rootElem:
+            msg[child.tag] = smart_str(child.text)
     return msg
 
 
@@ -68,25 +66,43 @@ def response_msg(request):
     rawStr = smart_str(request.raw_post_data)
     # 将文本进行解析,得到请求的数据
     msg = parse_msg(ET.fromstring(rawStr))
-    # 根据请求消息来处理内容返回
-    query_str = msg.get("Content")
-    # query_str = "hello"
     response_msg = ""
-    # 使用简单的处理逻辑，有待扩展
-    if query_str == "hi":
-        response_msg = "yo, sb"
+    #message_type = msg.get("MsgType")
+    message_type = msg["MsgType"]
+    #处理文本消息
+    if message_type == "text":
+        response_msg = handle_text(msg)
+    #处理事件消息
+    elif message_type == "event":
+        response_msg = handle_event(msg)
     else:
-        response_msg = "please input hi hahahahahah"
+        response_msg = 'Wrong Message Type!'
     # 返回消息
     # 包括post_msg，和对应的 response_msg
     return pack_text_xml(msg, response_msg)
-    #return response_msg
 
 
+def handle_text(msg):
+    content = msg.get("Content")
+    response = ""
+    if content == "hi":
+        response = "yo, sb"
+    else:
+        response = "please input hi hahahahahah"
+    return response
+
+def handle_event(msg):
+    eventKey = msg.get("EventKey")
+    response = ""
+    #登陆注册等事件
+    if eventKey == LOGIN:
+        response = "请输入您要进行的操作:\n1:登陆\n2:注册\n3:登出"
+    else:
+        #response = "Wrong Message Key!"
+        exit(0)
+    return response
 # 打包消息xml，作为返回    
 def pack_text_xml(post_msg,response_msg):
-    # f = post_msg['FromUserName']   
-    # t = post_msg['FromUserName']   
     text_tpl = '''<xml>   
                 <ToUserName><![CDATA[%s]]></ToUserName>
                 <FromUserName><![CDATA[%s]]></FromUserName>
