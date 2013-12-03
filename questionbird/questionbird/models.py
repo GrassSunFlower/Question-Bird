@@ -1,10 +1,16 @@
+#! /usr/bin/env python
+# coding=utf-8
 from django.db import models
 
 class User(models.Model):
-    wechatnumber = models.CharField(max_length = 50)
-    name = models.CharField(max_length = 50)
-    password = models.CharField(max_length = 30)
-    last_oper = models.IntegerField()
+	#MicroMessage name 微信名
+	mmname = models.CharField(max_length = 50)
+	#QuestionBird name 闻题鸟用户名
+	qbname = models.CharField(max_length = 50)
+    #闻题鸟密码
+	password = models.CharField(max_length = 30)
+    #最后的操作
+	last_oper = models.IntegerField()
 
 class Question(models.Model):
     askname = models.CharField(max_length = 50)
