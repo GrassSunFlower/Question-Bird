@@ -1,0 +1,15 @@
+body{
+}
+#login{
+}
+.form-signin{
+	padding-top:100%;
+	padding-left: 15%;
+	padding-right: 15%;
+}
+.form-control{
+	height: 8%;
+}
+#login-button{
+	height: 10%;
+}

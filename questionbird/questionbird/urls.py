@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from questionbird.views import *
+import settings
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -10,7 +11,12 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     #url(r'^admin/', include(admin.site.urls)),
-    (r'^test/$', test),
-    (r'^micromessage/$', handleRequest),
+    (r'^site_media/(?P<path>.*)$','django.views.static.serve', {'document_root':settings.STATIC_PATH}),
     (r'^$', index),
+    (r'^micromessage/$', handleRequest),
+    (r'^login', login),
+    (r'^register', register),
+    (r'^solved$', solved),
+    (r'^unsolved$', unsolved),
+    (r'^test$', test),
 )
