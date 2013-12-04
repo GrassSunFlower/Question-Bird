@@ -1,12 +1,12 @@
 <html>
 <head>
-  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, user-scalable=no" charset="utf-8"/>
+  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, height=device-height, user-scalable=no" charset="utf-8"/>
   <link rel="stylesheet" href="/site_media/css/bootstrap.min.css">
   <link rel="stylesheet" href="/site_media/css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="/site_media/css/login.css">
   <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
   <script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
-  <title>闻题鸟登陆页面</title>
+  <title>闻题鸟登录页面</title>
 </head>
 <body>
   <div class="container">
@@ -14,8 +14,14 @@
       <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
       <form class="form-signin" action="/loginform/" method="post">
         <input hidden name='mmname' value={{ mmname }}>
-        <input id="qbname" type="text" name="name" class="form-control" placeholder="用户名" required autofocus>
-        <input id="password" type="password" name="password" class="form-control" placeholder="密码" required>
+        <div class="input-group">
+          <span class="input-group-addon">账号</span>
+          <input type="text" name="name" class="form-control">
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon">密码</span>
+          <input type="password" name="password" class="form-control">
+        </div>
         <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
       </form>
     </div>
