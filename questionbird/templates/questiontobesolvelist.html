@@ -2,6 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" href="/site_media/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/site_media/css/questionlist.css" />
 	<script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
 	<script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
 	<title>待解决问题</title>
@@ -14,7 +15,7 @@
 				<li class="list-group-item">
 					<a class="pull-right">删除</a>
 					<span class="pull-right">&nbsp;&nbsp;</span>
-					<span class="badge">{{question.category}}</span>
+					<span class="badge" style="font-size:50px">{{question.category}}</span>
 					{{question.content}}
 				</li>
 			{% endfor %}
