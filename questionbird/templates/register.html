@@ -12,7 +12,8 @@
   <div class="container">
     <div id="register">
       <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
-      <form class="form-signin" action="/registerForm/" method="post">
+      <form class="form-signin" action="/register/" method="post">
+        <input hidden name='mmname' value={{ mmname }}>
         <input type="text" name="name" class="form-control" placeholder="用户名" required autofocus>
         <input type="password" name="password" class="form-control" placeholder="密码" required>
 		    <input type="password" name="confirm" class="form-control" placeholder="确定密码" required>
