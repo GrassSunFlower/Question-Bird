@@ -97,13 +97,13 @@ def handle_text(msg, user):
 	response = ""
 	if user.last_oper == 100:
 		if content == '1':
-			response = "登陆页面已为您准备好，请点击<a href='questionbird.sinaapp.com/login'>这里</a>"
+			response = "Login Page is ready<a href='questionbird.sinaapp.com/login/?mmaname=%s'>click here</a>" %user.mmname
 			user.last_oper = 0
 		elif content == '2':
-			response = "注册页面已为您准备好，请点击<a href='questionbird.sinaapp.com/register'>这里</a>"
+			response = "Register Page is ready<a href='questionbird.sinaapp.com/register/?mmaname=%s'>click here</a>" %user.mmname
 			user.last_oper = 0
 		elif content == '3':
-			response = "登出页面已为您准备好，请点击<a href='questionbird.sinaapp.com/login'>这里</a>"
+			response = "Logout Page is ready<a href='questionbird.sinaapp.com/login/?mmaname=%s'>click here</a>" %user.mmname
 			user.last_oper = 0
 		else:
 			response = "无效命令，请重新输入："
@@ -116,18 +116,26 @@ def handle_text(msg, user):
 			response = "please input hi hahahahahah"
 	return response
 
+
 def handle_event(msg, user):
 	eventKey = msg.get("EventKey")
-	response = ""
 	#登陆注册等事件
-	if eventKey == LOGIN:
-		response = "请输入您要进行的操作:\n1:登陆\n2:注册\n3:登出"
-		user.last_oper = 100
-		user.save()
+	if eventKey == E_KEY_LOGIN:
+		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Login</a>" %user.mmname
+		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>Register</a>" %user.mmname
+		logout = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Logout</a>" %user.mmname
+		response = "Please Click:\n 1:%s\n 2:%s\n 3:%s" %(login, register, logout)
+		user.last_oper = 0
+	elif eventKey == E_KEY_SOLVED:
+		response = "Solved Page Ready:<a href='http://questionbird.sinaapp.com/solved/?mmname=%s'>click here</a>" %user.mmname
+		user.last_oper = 0
 	else:
 		#response = "Wrong Message Key!"
 		exit(0)
+	user.save()
 	return response
+
+
 # 打包消息xml，作为返回    
 def pack_text_xml(post_msg,response_msg):
 	text_tpl = '''<xml>   
@@ -142,21 +150,39 @@ def pack_text_xml(post_msg,response_msg):
 	# 调换发送者和接收者，然后填入需要返回的信息到xml中
 	return text_tpl
 
+
 def test(request):
-	user = User.objects.filter(qbname='yo111')
+	user = User.objects.filter(qbname='yo')
 	if len(user) == 0:
-		html = "<html><body>%s</body></html>" % 'hahaha'
+		html = "<html><body><a href='www.baidu.com/?name=%s'>123</a></body></html>" % 'hahaha'
 	else:
-		html = "<html><body>%s</body></html>" % user[0].password
+		html = "<html><body><a href='www.baidu.com/?name=%s'>123</a></body></html>" % user[0].password
 	return HttpResponse(html)
 
 
 def login(request):
-	return render_to_response('login.html')
-
+	if request.method == "GET" and 'mmname' in request.GET:
+		mmname_value = request.GET['mmname']
+		return render_to_response('login.html', {'mmname':mmname_value})
+	else:
+		html = "<html><body>None</body></html>"
+		return HttpResponse(html)
 
 def solved(request):
-	return render_to_response('questionsolvedlist.html')
+	if request.method == "GET" and 'mmname' in request.GET:
+		mmname = request.GET['mmname']
+		userlist = User.objects.filter(mmname=mmname)
+		qbname = userlist[0].qbname
+		qbuserlist = QBUser.objects.filter(qbname=qbname)
+		if len(qbuserlist) != 0:
+			questionlist = Question.objects.filter(ques_owner=qbname, question_state="已解决")
+			return render_to_response('questionsolvedlist.html', {'qbname':qbname,'questions':questionlist})
+		else:
+			html = "<html><body>请登录！</body></html>"
+			return HttpResponse(html)
+	else:
+		html = "<html><body>请登录！</body></html>"
+		return HttpResponse(html)
 
 
 def unsolved(request):
@@ -164,8 +190,51 @@ def unsolved(request):
 
 
 def register(request):
-	return render_to_response('register.html')
+	if request.method == "GET" and 'mmname' in request.GET:
+		mmname = request.GET['mmname']
+		return render_to_response('register.html', {'mmname':mmname})
+	elif request.method == "POST" and 'mmname' in request.POST:
+		mmname = request.POST['mmname']
+		qbname = request.POST['name']
+		password = request.POST['password']
+		qbuserlist = QBUser.objects.filter(qbname=qbname)
+		if len(qbuserlist) == 0:
+			qbuser = QBUser(qbname=qbname, password=password)
+			qbuser.save()
+			userlist = User.objects.filter(mmname=mmname)
+			user = userlist[0]
+			user.qbname = request.POST['name']
+			user.password = request.POST['password']
+			user.last_oper = 0
+			user.save()
+			helloword = "Register successfully and login automatically.Hello, %s!" % qbname
+			html = "<html><body>%s</body></html>" % helloword
+			return HttpResponse(html)
+		else:
+			return render_to_response('register.html', {'mmname':mmname})
+	else:
+		if request.method == "POST":
+			for key in request.POST:
+				print key
+		html = "<html><body>None</body></html>"
+		return HttpResponse(html)
 
+
+def loginform(request):
+	if request.method == "POST" and 'mmname' in request.POST:
+		mmname= request.POST['mmname']
+		userlist = User.objects.filter(mmname=mmname)
+		user = userlist[0]
+		user.qbname = request.POST['name']
+		user.password = request.POST['password']
+		user.last_oper = 0
+		user.save()
+		helloword = "welcome to QuestionBird, %s!" % user.qbname
+		html = "<html><body>%s</body></html>" % helloword
+		return HttpResponse(html)
+	else:
+		html = "<html><body>None</body></html>"
+		return HttpResponse(html)
 	
 def index(request):
 	helloword = "welcome to QuestionBird!"
