@@ -14,6 +14,14 @@
       <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
       <form class="form-signin" action="/register/" method="post">
         <input hidden name='mmname' value={{ mmname }}>
+        {% if state == "success" %}
+          <div id='info'>注册成功!已自动登陆。</div>
+        {% elif state == "existed" %}
+          <div id='info'>注册失败，用户已存在!</div>
+        {% elif state == "null" %}
+          <div id='info'>账号和密码不能为空!</div>
+        {% else %}
+        {% endif %}
         <div class="input-group">
           <span class="input-group-addon">账号</span>
           <input type="text" name="name" class="form-control">

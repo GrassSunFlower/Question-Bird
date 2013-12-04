@@ -26,7 +26,7 @@ def handleRequest(request):
 		response = HttpResponse(response_msg(request))
 		return response
 	else:
-		return None
+		return HttpResponse('看不到你看不到')
 
 
 def checkSignature(request):
@@ -96,24 +96,12 @@ def handle_text(msg, user):
 	content = msg.get("Content")
 	response = ""
 	if user.last_oper == 100:
-		if content == '1':
-			response = "Login Page is ready<a href='questionbird.sinaapp.com/login/?mmaname=%s'>click here</a>" %user.mmname
-			user.last_oper = 0
-		elif content == '2':
-			response = "Register Page is ready<a href='questionbird.sinaapp.com/register/?mmaname=%s'>click here</a>" %user.mmname
-			user.last_oper = 0
-		elif content == '3':
-			response = "Logout Page is ready<a href='questionbird.sinaapp.com/login/?mmaname=%s'>click here</a>" %user.mmname
-			user.last_oper = 0
-		else:
-			response = "无效命令，请重新输入："
-			user.last_oper = 100
 		user.save()
 	else:
 		if content == "hi":
 			response = "yo, sb"
 		else:
-			response = "please input hi hahahahahah"
+			response = "请点击下面的按钮选择相应的服务~"
 	return response
 
 
@@ -124,10 +112,13 @@ def handle_event(msg, user):
 		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Login</a>" %user.mmname
 		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>Register</a>" %user.mmname
 		logout = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Logout</a>" %user.mmname
-		response = "Please Click:\n 1:%s\n 2:%s\n 3:%s" %(login, register, logout)
+		response = "Please Click:\n%s %s %s" %(login, register, logout)
 		user.last_oper = 0
 	elif eventKey == E_KEY_SOLVED:
-		response = "Solved Page Ready:<a href='http://questionbird.sinaapp.com/solved/?mmname=%s'>click here</a>" %user.mmname
+		response = "Solved Questions Page Ready:<a href='http://questionbird.sinaapp.com/solved/?mmname=%s'>click here</a>" %user.mmname
+		user.last_oper = 0
+	elif eventKey == E_KEY_UNSOLVED:
+		response = "Unsolved Questions Page Ready:<a href='http://questionbird.sinaapp.com/unsolved/?mmname=%s'>click here</a>" %user.mmname
 		user.last_oper = 0
 	else:
 		#response = "Wrong Message Key!"
@@ -165,7 +156,7 @@ def login(request):
 		mmname_value = request.GET['mmname']
 		return render_to_response('login.html', {'mmname':mmname_value})
 	else:
-		html = "<html><body>None</body></html>"
+		html = "<html><body><h3>无效的访问</h3></body></html>"
 		return HttpResponse(html)
 
 def solved(request):
@@ -178,25 +169,40 @@ def solved(request):
 			questionlist = Question.objects.filter(ques_owner=qbname, question_state="已解决")
 			return render_to_response('questionsolvedlist.html', {'qbname':qbname,'questions':questionlist})
 		else:
-			html = "<html><body>请登录！</body></html>"
+			html = "<html><body><h3>请登录!</h3></body></html>"
 			return HttpResponse(html)
 	else:
-		html = "<html><body>请登录！</body></html>"
+		html = "<html><body><h3>请登录!</h3></body></html>"
 		return HttpResponse(html)
 
 
 def unsolved(request):
-	return render_to_response('questiontobesolvelist.html')
+	if request.method == "GET" and 'mmname' in request.GET:
+		mmname = request.GET['mmname']
+		userlist = User.objects.filter(mmname=mmname)
+		qbname = userlist[0].qbname
+		qbuserlist = QBUser.objects.filter(qbname=qbname)
+		if len(qbuserlist) != 0:
+			questionlist = Question.objects.filter(ques_owner=qbname, question_state="待解决")
+			return render_to_response('questiontobesolvelist.html', {'qbname':qbname,'questions':questionlist})
+		else:
+			html = "<html><body><h3>请登录!</h3></body></html>"
+			return HttpResponse(html)
+	else:
+		html = "<html><body><h3>请登录!</h3></body></html>"
+		return HttpResponse(html)
 
 
 def register(request):
 	if request.method == "GET" and 'mmname' in request.GET:
 		mmname = request.GET['mmname']
-		return render_to_response('register.html', {'mmname':mmname})
+		return render_to_response('register.html', {'mmname':mmname, 'state':'unknown'})
 	elif request.method == "POST" and 'mmname' in request.POST:
 		mmname = request.POST['mmname']
 		qbname = request.POST['name']
 		password = request.POST['password']
+		if qbname == '' or password == '':
+			return render_to_response('register.html', {'mmname':mmname, 'state':'null'})
 		qbuserlist = QBUser.objects.filter(qbname=qbname)
 		if len(qbuserlist) == 0:
 			qbuser = QBUser(qbname=qbname, password=password)
@@ -207,16 +213,14 @@ def register(request):
 			user.password = request.POST['password']
 			user.last_oper = 0
 			user.save()
-			helloword = "Register successfully and login automatically.Hello, %s!" % qbname
-			html = "<html><body>%s</body></html>" % helloword
-			return HttpResponse(html)
+			return render_to_response('register.html', {'mmname':mmname, 'state':'success'})
 		else:
-			return render_to_response('register.html', {'mmname':mmname})
+			return render_to_response('register.html', {'mmname':mmname, 'state':'existed'})
 	else:
 		if request.method == "POST":
 			for key in request.POST:
 				print key
-		html = "<html><body>None</body></html>"
+		html = "<html><body><h3>无效的访问</h3></body></html>"
 		return HttpResponse(html)
 
 
@@ -230,7 +234,7 @@ def loginform(request):
 		user.last_oper = 0
 		user.save()
 		helloword = "welcome to QuestionBird, %s!" % user.qbname
-		html = "<html><body>%s</body></html>" % helloword
+		html = "<html><body><h3>%s</h3></body></html>" % helloword
 		return HttpResponse(html)
 	else:
 		html = "<html><body>None</body></html>"
@@ -238,5 +242,5 @@ def loginform(request):
 	
 def index(request):
 	helloword = "welcome to QuestionBird!"
-	html = "<html><body>%s</body></html>" % helloword
+	html = "<html><body><h3>%s</h3></body></html>" % helloword
 	return HttpResponse(html)
