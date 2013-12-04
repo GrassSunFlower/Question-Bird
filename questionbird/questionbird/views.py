@@ -96,30 +96,86 @@ def handle_text(msg, user):
 	content = msg.get("Content")
 	response = ""
 	if user.last_oper == 100:
-		user.save()
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			question = Question(
+								ques_owner=user.qbname,content='',category='',
+								question_state='已选科',answer='',answer_state='',
+								answer_satis='',answer_eva='',solver_name='')
+			if content in CATEGORY_DIC:
+				question.category = CATEGORY_DIC[content]
+				question.save()
+				user.last_oper = 101
+				response = '您的问题类型为:%s\n\r请输入您要提问的内容:' %question.category
+			else:
+				response = '无效的选项，请重新输入'
+				user.last_oper = 100
+	elif user.last_oper == 101:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			questionlist = Question.objects.filter(ques_owner=user.qbname,question_state='已选科')
+			if len(questionlist) == 0:
+				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
+				user.last_oper = 0
+			else:
+				question = questionlist[0]
+				question.content = content
+				question.question_state = '待解决'
+				user.last_oper = 0
+				question.save()
+				response = '提问成功，半小时内将有老师为您解答，请耐心等待~'
 	else:
 		if content == "hi":
 			response = "yo, sb"
 		else:
 			response = "请点击下面的按钮选择相应的服务~"
+		user.last_oper = 0
+	user.save()
 	return response
 
 
 def handle_event(msg, user):
 	eventKey = msg.get("EventKey")
-	#登陆注册等事件
-	if eventKey == E_KEY_LOGIN:
-		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Login</a>" %user.mmname
-		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>Register</a>" %user.mmname
-		logout = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>Logout</a>" %user.mmname
-		response = "Please Click:\n%s %s %s" %(login, register, logout)
+	#登录注册等事件
+	#未登录时可注册和登录
+	if eventKey == E_KEY_LOGIN and len(user.qbname) == 0:
+		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>登录</a>" %user.mmname.encode('utf-8')
+		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>注册</a>" %user.mmname.encode('utf-8')
+		response = "请选择需要的操作:\n\r%s     %s" %(login, register)
 		user.last_oper = 0
+	#已登录后只能登出
+	elif eventKey == E_KEY_LOGIN:
+		user.qbname = ''
+		user.password = ''
+		user.save()
+		user.last_oper = 0
+		response = '登出成功!'
+	elif eventKey == E_KEY_ASK:
+		#尚未登录
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			response = "请选择问题类型:\n\r1.小学语文\n\r2.小学数学\n\r3.初中语文\n\r4.初中数学\n\r5.初中英语\n\r6.高中语文\n\r7.高中数学\n\r8.高中英语"
+			user.last_oper = 100
 	elif eventKey == E_KEY_SOLVED:
-		response = "Solved Questions Page Ready:<a href='http://questionbird.sinaapp.com/solved/?mmname=%s'>click here</a>" %user.mmname
-		user.last_oper = 0
+		if len(user.qbname) == 0:
+			response = '请先登录!'
+			user.last_oper = 0
+		else:
+			response = "已解决问题的列表页面已为您准备好，请<a href='http://questionbird.sinaapp.com/solved/?mmname=%s'>点击</a>" %user.mmname.encode('utf-8')
+			user.last_oper = 0
 	elif eventKey == E_KEY_UNSOLVED:
-		response = "Unsolved Questions Page Ready:<a href='http://questionbird.sinaapp.com/unsolved/?mmname=%s'>click here</a>" %user.mmname
-		user.last_oper = 0
+		if len(user.qbname) == 0:
+			response = '请先登录!'
+			user.last_oper = 0
+		else:
+			response = "待解决问题的列表页面已为您准备好，请<a href='http://questionbird.sinaapp.com/unsolved/?mmname=%s'>点击</a>" %user.mmname.encode('utf-8')
+			user.last_oper = 0
 	else:
 		#response = "Wrong Message Key!"
 		exit(0)
@@ -201,8 +257,11 @@ def register(request):
 		mmname = request.POST['mmname']
 		qbname = request.POST['name']
 		password = request.POST['password']
+		confirm = request.POST['confirm']
 		if qbname == '' or password == '':
 			return render_to_response('register.html', {'mmname':mmname, 'state':'null'})
+		if password != confirm:
+			return render_to_response('register.html', {'mmname':mmname, 'state':'different'})
 		qbuserlist = QBUser.objects.filter(qbname=qbname)
 		if len(qbuserlist) == 0:
 			qbuser = QBUser(qbname=qbname, password=password)

@@ -20,6 +20,8 @@
           <div id='info'>注册失败，用户已存在!</div>
         {% elif state == "null" %}
           <div id='info'>账号和密码不能为空!</div>
+        {% elif state == "different" %}
+          <div id='info'>两次输入的密码不相同!</div>
         {% else %}
         {% endif %}
         <div class="input-group">

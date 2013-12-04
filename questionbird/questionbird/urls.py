@@ -19,5 +19,5 @@ urlpatterns = patterns('',
     (r'^solved/', solved),
     (r'^unsolved/', unsolved),
     (r'^loginform/', loginform),
-    (r'^test$', test),
+    (r'^test/$', test),
 )
