@@ -48,3 +48,7 @@ class QBUser(models.Model):
     unsolved_num = models.IntegerField()
     #年级
     grade = models.CharField(max_length=30)
+
+class Suggestion(models.Model):
+    #建议内容
+    content = models.CharField(max_length=100)

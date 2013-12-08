@@ -214,6 +214,15 @@ def handle_text(msg, user):
 				else:
 					response = '无效的选项，请重新输入'
 					user.last_oper = 106
+	elif user.last_oper == 107:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			suggestion = Suggestion(content = content)
+			suggestion.save()
+			response = "谢谢您的建议，闻题鸟将在您的帮助下更加完善。"
+			user.last_oper = 0
 	else:
 		if content == "hi":
 			response = "yo, sb"
@@ -292,7 +301,28 @@ def handle_event(msg, user):
 		else:
 			response = "请选择新的年级:\n\r1.小学一年级\n\r2.小学二年级\n\r3.小学三年级\n\r4.小学四年级\n\r5.小学五年级\n\r6.小学六年级\n\r7.初中一年级\n\r8.初中二年级\n\r9.初中三年级\n\r10.高中一年级\n\r11.高中二年级\n\r12.高中三年级"
 			user.last_oper = 106
-	else:
+	elif eventKey == E_KEY_PRODUCT:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			response = "闻题鸟微信服务号V1.0由一盆小铜钱小组为您敬上。了解更多我们的信息请致电15959542364。"
+			user.last_oper = 0
+	elif eventKey == E_KEY_FEEDBACK:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			response = "尊敬的用户您好，欢迎发送任何您的意见和建议:"
+			user.last_oper = 107
+	elif eventKey == E_KEY_ACTIVITY:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			response = "暂时没有活动信息哦，敬请期待我们接下来推出的活动。"
+			user.last_oper = 0
+	else:	
 		#response = "Wrong Message Key!"
 		exit(0)
 	user.save()

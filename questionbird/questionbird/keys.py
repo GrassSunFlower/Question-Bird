@@ -22,6 +22,12 @@ E_KEY_NICKNAME = "Q_chg_name"
 E_KEY_PASS = "Q_chg_pass"
 #更改年级的eventkey值
 E_KEY_GRADE = "Q_chg_grade"
+#产品信息的eventkey值
+E_KEY_PRODUCT = "Q_product_info"
+#反馈意见的eventkey值
+E_KEY_FEEDBACK = "Q_feedback"
+#查看活动的eventkey值
+E_KEY_ACTIVITY = "Q_activity"
 
 CATEGORY_DIC = {
 	'1' : '小学语文',
