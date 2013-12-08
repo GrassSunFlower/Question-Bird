@@ -127,7 +127,33 @@ def handle_text(msg, user):
 				question.question_state = '待解决'
 				user.last_oper = 0
 				question.save()
+				qbuser = QBUser.objects.get(qbname=user.qbname)
+				qbuser.learncoin -= 2
+				qbuser.question_num += 1
+				qbuser.unsolved_num += 1
+				qbuser.save()
 				response = '提问成功，半小时内将有老师为您解答，请耐心等待~'
+	elif user.last_oper == 102:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
+			questionlist = Question.objects.filter(ques_owner=user.qbname)
+			if len(qbuserlist) == 0:
+				response = "未知的错误!请重新点击'更改昵称'按钮修改您的昵称"
+				user.last_oper = 0
+			else:			
+				qbuser = qbuserlist[0]
+				qbuser.qbname = content
+				qbuser.save()
+				user.qbname = content
+				user.save()
+				for i in range(0, len(questionlist)):
+					questionlist[i].ques_owner=content
+					questionlist[i].save()
+				response = '修改成功!您好，%s' %(qbuser.qbname) 
+				user.last_oper = 0
 	else:
 		if content == "hi":
 			response = "yo, sb"
@@ -176,6 +202,21 @@ def handle_event(msg, user):
 		else:
 			response = "待解决问题的列表页面已为您准备好，请<a href='http://questionbird.sinaapp.com/unsolved/?mmname=%s'>点击</a>" %user.mmname.encode('utf-8')
 			user.last_oper = 0
+	elif eventKey == E_KEY_INFO:
+			if len(user.qbname) == 0:
+				response = '请先登录!'
+				user.last_oper = 0
+			else:
+				qbuser = QBUser.objects.get(qbname=user.qbname)
+				response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" %(qbuser.qbname.encode('utf-8'), qbuser.grade.encode('utf-8'), qbuser.learncoin, qbuser.question_num, qbuser.unsolved_num)
+				user.last_oper = 0
+	elif eventKey == E_KEY_NICKNAME:
+			if len(user.qbname) == 0:
+				response = '请先登录!'
+				user.last_oper = 0
+			else:
+				response = '请输入您的新昵称:'
+				user.last_oper = 102
 	else:
 		#response = "Wrong Message Key!"
 		exit(0)
@@ -264,7 +305,7 @@ def register(request):
 			return render_to_response('register.html', {'mmname':mmname, 'state':'different'})
 		qbuserlist = QBUser.objects.filter(qbname=qbname)
 		if len(qbuserlist) == 0:
-			qbuser = QBUser(qbname=qbname, password=password)
+			qbuser = QBUser(qbname=qbname, password=password, learncoin=200, question_num=0, unsolved_num=0, grade="小学一年级")
 			qbuser.save()
 			userlist = User.objects.filter(mmname=mmname)
 			user = userlist[0]

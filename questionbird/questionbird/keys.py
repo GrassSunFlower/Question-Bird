@@ -14,6 +14,12 @@ E_KEY_ASK = "Q_ask_ques"
 E_KEY_SOLVED = "Q_solved_ques"
 #查看待解决的问题的eventkey值
 E_KEY_UNSOLVED = "Q_unsolved_ques"
+#查看资料的eventkey值
+E_KEY_INFO = "Q_information"
+#更改昵称的eventkey值
+E_KEY_NICKNAME = "Q_chg_name"
+#更改密码的eventkey值
+E_KEY_PASS = "Q_chg_pass"
 
 CATEGORY_DIC = {
 	'1' : '小学语文',
