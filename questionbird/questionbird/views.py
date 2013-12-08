@@ -91,7 +91,7 @@ def response_msg(request):
 	# 返回消息
 	return pack_text_xml(msg, response_msg)
 
-
+new_pass = ''
 def handle_text(msg, user):
 	content = msg.get("Content")
 	response = ""
@@ -154,6 +154,66 @@ def handle_text(msg, user):
 					questionlist[i].save()
 				response = '修改成功!您好，%s' %(qbuser.qbname) 
 				user.last_oper = 0
+	elif user.last_oper == 103:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			if user.password == content:
+				response = "请输入新密码:"
+				user.last_oper = 104
+			else:
+				response = "输入错误，请重新输入:"
+				user.last_oper = 103
+	elif user.last_oper == 104:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			global new_pass 
+			new_pass = content
+			response = "请再次输入:"
+			user.last_oper = 105
+	elif user.last_oper == 105:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			global new_pass 
+			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
+			if len(qbuserlist) == 0:
+				response = "未知的错误!请重新点击'更改密码'按钮修改您的密码"
+				user.last_oper = 0
+			elif new_pass == content:
+				qbuser = qbuserlist[0]
+				qbuser.password = content
+				qbuser.save()
+				user.password = content
+				user.save()
+				response = "修改成功!"
+				user.last_oper = 0
+			else:
+				response = "两次输入不同，请重新输入新密码:"
+				user.last_oper = 104
+	elif user.last_oper == 106:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
+			if len(qbuserlist) == 0:
+				response = "未知的错误!请重新点击'更改年级'按钮修改您的年级"
+				user.last_oper = 0
+			else:
+				if content in CATEGORY_GRADE_DIC:
+					qbuser = qbuserlist[0]
+					qbuser.grade = CATEGORY_GRADE_DIC[content]
+					qbuser.save()
+					response = '修改成功!' 
+					user.last_oper = 0
+				else:
+					response = '无效的选项，请重新输入'
+					user.last_oper = 106
 	else:
 		if content == "hi":
 			response = "yo, sb"
@@ -203,20 +263,35 @@ def handle_event(msg, user):
 			response = "待解决问题的列表页面已为您准备好，请<a href='http://questionbird.sinaapp.com/unsolved/?mmname=%s'>点击</a>" %user.mmname.encode('utf-8')
 			user.last_oper = 0
 	elif eventKey == E_KEY_INFO:
-			if len(user.qbname) == 0:
-				response = '请先登录!'
-				user.last_oper = 0
-			else:
-				qbuser = QBUser.objects.get(qbname=user.qbname)
-				response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" %(qbuser.qbname.encode('utf-8'), qbuser.grade.encode('utf-8'), qbuser.learncoin, qbuser.question_num, qbuser.unsolved_num)
-				user.last_oper = 0
+		if len(user.qbname) == 0:
+			response = '请先登录!'
+			user.last_oper = 0
+		else:
+			qbuser = QBUser.objects.get(qbname=user.qbname)
+			response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" %(qbuser.qbname.encode('utf-8'), qbuser.grade.encode('utf-8'), qbuser.learncoin, qbuser.question_num, qbuser.unsolved_num)
+			user.last_oper = 0
 	elif eventKey == E_KEY_NICKNAME:
-			if len(user.qbname) == 0:
-				response = '请先登录!'
-				user.last_oper = 0
-			else:
-				response = '请输入您的新昵称:'
-				user.last_oper = 102
+		if len(user.qbname) == 0:
+			response = '请先登录!'
+			user.last_oper = 0
+		else:
+			response = '请输入您的新昵称:'
+			user.last_oper = 102
+	elif eventKey == E_KEY_PASS:
+		if len(user.qbname) == 0:
+			response = '请先登录!'
+			user.last_oper = 0
+		else:
+			response = '请输入原密码:'
+			user.last_oper = 103
+	elif eventKey == E_KEY_GRADE:
+		#尚未登录
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			response = "请选择新的年级:\n\r1.小学一年级\n\r2.小学二年级\n\r3.小学三年级\n\r4.小学四年级\n\r5.小学五年级\n\r6.小学六年级\n\r7.初中一年级\n\r8.初中二年级\n\r9.初中三年级\n\r10.高中一年级\n\r11.高中二年级\n\r12.高中三年级"
+			user.last_oper = 106
 	else:
 		#response = "Wrong Message Key!"
 		exit(0)

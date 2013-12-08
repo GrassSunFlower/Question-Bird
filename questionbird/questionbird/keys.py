@@ -20,6 +20,8 @@ E_KEY_INFO = "Q_information"
 E_KEY_NICKNAME = "Q_chg_name"
 #更改密码的eventkey值
 E_KEY_PASS = "Q_chg_pass"
+#更改年级的eventkey值
+E_KEY_GRADE = "Q_chg_grade"
 
 CATEGORY_DIC = {
 	'1' : '小学语文',
@@ -30,4 +32,19 @@ CATEGORY_DIC = {
 	'6' : '高中语文',
 	'7' : '高中数学',
 	'8' : '高中英语',
+}
+
+CATEGORY_GRADE_DIC = {
+	'1' : '小学一年级',
+	'2' : '小学二年级',
+	'3' : '小学三年级',
+	'4' : '小学四年级',
+	'5' : '小学五年级',
+	'6' : '小学六年级',
+	'7' : '初中一年级',
+	'8' : '初中二年级',
+	'9' : '初中三年级',
+	'10': '高中一年级',
+	'11': '高中二年级',
+	'12': '高中三年级',
 }
