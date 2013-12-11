@@ -52,3 +52,15 @@ class QBUser(models.Model):
 class Suggestion(models.Model):
     #建议内容
     content = models.CharField(max_length=100)
+
+class Teacher(models.Model):
+    #QuestionBird        教师用户名
+    teachername = models.CharField(max_length=50)
+    #教师密码
+    password =  models.CharField(max_length=30)
+    #教师擅长学科
+    subjects = models.CharField(max_length=100)
+
+class RequestCode(models.Model):
+    #邀请码
+    request_code = models.CharField(max_length=30)
