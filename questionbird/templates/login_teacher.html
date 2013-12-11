@@ -1,0 +1,37 @@
+<html>
+<head>
+  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, height=device-height, user-scalable=no" charset="utf-8"/>
+  <link rel="stylesheet" href="/site_media/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/site_media/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/site_media/css/login.css">
+  <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
+  <title>闻题鸟教师端登录页面</title>
+</head>
+<body>
+  <div class="container">
+    <div id="login">
+      <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
+      <form class="form-signin" action="/login_teacher/" method="post">
+        {% if state == "nonexisted" %}
+          <div id='info'>登录失败，用户不存在!</div>
+        {% elif state == "null" %}
+          <div id='info'>账号和密码不能为空!</div>
+        {% elif state == "wrong" %}
+          <div id='info'>密码错误!</div>
+        {% else %}
+        {% endif %}
+        <div class="input-group">
+          <span class="input-group-addon">账号</span>
+          <input type="text" name="name" class="form-control">
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon">密码</span>
+          <input type="password" name="password" class="form-control">
+        </div>
+        <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
