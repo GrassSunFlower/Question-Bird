@@ -54,10 +54,12 @@ class Suggestion(models.Model):
     content = models.CharField(max_length=100)
 
 class Teacher(models.Model):
-    #QuestionBird        教师用户名
+    #QuestionBird教师用户名
     teachername = models.CharField(max_length=50)
     #教师密码
-    password =  models.CharField(max_length=30)
+    password = models.CharField(max_length=30)
+    #身份证号
+    IDnumber = models.CharField(max_length=30)
     #教师擅长学科
     subjects = models.CharField(max_length=100)
 
