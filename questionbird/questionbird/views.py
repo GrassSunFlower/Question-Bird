@@ -13,6 +13,8 @@ from questionbird.models import *
 from django.shortcuts import *
 from django.template import *
 
+
+new_pass = ''
 # Create your views here.
 @csrf_exempt
 def handleRequest(request):
@@ -56,11 +58,6 @@ def parse_msg(rootElem):
     return msg
 
 
-def set_content():
-    content = "lulululu"
-    return content
-
-
 def create_user(mmname):
     user = User(mmname=mmname, qbname='', password='', last_oper=0)
     user.save()
@@ -85,13 +82,13 @@ def response_msg(request):
     #处理事件消息
     elif message_type == "event":
         response_msg = handle_event(msg, user[0])
+    #处理语音消息
+    elif message_type == "voice":
+        response_msg = handle_voice(msg, user[0])
     else:
         response_msg = 'Wrong Message Type!'
     # 返回消息
     return pack_text_xml(msg, response_msg)
-
-
-new_pass = ''
 
 
 def handle_text(msg, user):
@@ -360,15 +357,6 @@ def test(request):
     return HttpResponse(html)
 
 
-def login(request):
-    if request.method == "GET" and 'mmname' in request.GET:
-        mmname_value = request.GET['mmname']
-        return render_to_response('login.html', {'mmname': mmname_value})
-    else:
-        html = "<html><body><h3>无效的访问</h3></body></html>"
-        return HttpResponse(html)
-
-
 def solved(request):
     if request.method == "GET" and 'mmname' in request.GET:
         mmname = request.GET['mmname']
@@ -431,27 +419,37 @@ def register(request):
         else:
             return render_to_response('register.html', {'mmname': mmname, 'state': 'existed'})
     else:
-        if request.method == "POST":
-            for key in request.POST:
-                print key
         html = "<html><body><h3>无效的访问</h3></body></html>"
         return HttpResponse(html)
 
 
-def loginform(request):
-    if request.method == "POST" and 'mmname' in request.POST:
+def login(request):
+    if request.method == "GET" and 'mmname' in request.GET:
+        mmname_value = request.GET['mmname']
+        return render_to_response('login.html', {'mmname': mmname_value})
+    elif request.method == "POST" and 'mmname' in request.POST:
         mmname = request.POST['mmname']
-        userlist = User.objects.filter(mmname=mmname)
-        user = userlist[0]
-        user.qbname = request.POST['name']
-        user.password = request.POST['password']
-        user.last_oper = 0
-        user.save()
-        helloword = "welcome to QuestionBird, %s!" % user.qbname
-        html = "<html><body><h3>%s</h3></body></html>" % helloword
-        return HttpResponse(html)
+        qbname = request.POST['name']
+        password = request.POST['password']
+        if qbname == '' or password == '':
+            return render_to_response('login.html', {'mmname': mmname, 'state': 'null'})
+        qbuserlist = QBUser.objects.filter(qbname=qbname)
+        if len(qbuserlist) != 0:
+            qbuser = qbuserlist[0]
+            if qbuser.qbname == qbname and qbuser.password == password:
+                userlist = User.objects.filter(mmname=mmname)
+                user = userlist[0]
+                user.qbname = qbname
+                user.password = password
+                user.last_oper = 0
+                user.save()
+                return render_to_response('login.html', {'mmname': mmname, 'state': 'success'})
+            else:
+                return render_to_response('login.html', {'mmname': mmname, 'state': 'fail'})
+        else:
+            return render_to_response('login.html', {'mmname': mmname, 'state': 'unexisted'})
     else:
-        html = "<html><body>None</body></html>"
+        html = "<html><body><h3>无效的访问</h3></body></html>"
         return HttpResponse(html)
 
 

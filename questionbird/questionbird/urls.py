@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     (r'^register', register),
     (r'^solved/', solved),
     (r'^unsolved/', unsolved),
-    (r'^loginform/', loginform),
+    #(r'^loginform/', loginform),
     (r'^test/$', test),
     (r'^login_teacher/', login_teacher),
 )

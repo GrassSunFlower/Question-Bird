@@ -12,8 +12,18 @@
   <div class="container">
     <div id="login">
       <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
-      <form class="form-signin" action="/loginform/" method="post">
+      <form class="form-signin" action="/login/" method="post">
         <input hidden name='mmname' value={{ mmname }}>
+        {% if state == "success" %}
+          <div id='info'>登录成功!欢迎使用闻题鸟。</div>
+        {% elif state == "unexisted" %}
+          <div id='info'>登录失败，用户不存在!</div>
+        {% elif state == "null" %}
+          <div id='info'>账号和密码不能为空!</div>
+        {% elif state == "fail" %}
+          <div id='info'> 登录失败！密码错误。</div>
+        {% else %}
+        {% endif %}
         <div class="input-group">
           <span class="input-group-addon">账号</span>
           <input type="text" name="name" class="form-control">
