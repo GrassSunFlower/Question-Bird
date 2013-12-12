@@ -3,8 +3,12 @@
 
 #token值
 QB_TOKEN = "questionbird"
-#返回类型,默认为文本信息
-RET_TYPE = "text"
+#AppId值 在微信公共平台管理页获得
+APP_ID = "wx2a405d14abedb32c"
+#AppSecret值 在微信公共平台管理页获得
+APP_SECRET = "a4ddbe11cf22ceac471e10bfb8de3836"
+#获取access_token的url
+ACCESS_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s"
 
 #登陆、注册、登出操作的eventkey值
 E_KEY_LOGIN = "Q_login_regis_logout"
