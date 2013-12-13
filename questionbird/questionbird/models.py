@@ -19,6 +19,10 @@ class Question(models.Model):
     ques_owner = models.CharField(max_length=50)
     #问题的文字内容
     content = models.CharField(max_length=200)
+    #问题中的图片
+    ques_image = models.CharField(max_length=100)
+    #问题中的语音
+    ques_voice = models.CharField(max_length=100)
     #问题的科目分类
     category = models.CharField(max_length=30)
     #语音消息的id
@@ -27,8 +31,12 @@ class Question(models.Model):
     pic_id = models.CharField(max_length=100)
     #问题的状态：已解决或待解决
     question_state = models.CharField(max_length=10)
-    #回答
+    #回答内容
     answer = models.CharField(max_length=100)
+    #回答中的图片
+    answer_image = models.CharField(max_length=100)
+    #回答中的语音
+    answer_voice = models.CharField(max_length=100)
     #回答的状态：已评价或未评价
     answer_state = models.CharField(max_length=10)
     #回答的满意度
@@ -37,7 +45,6 @@ class Question(models.Model):
     answer_eva = models.CharField(max_length=20)
     #回答教师的名字
     solver_name = models.CharField(max_length=50)
-
 
 class QBUser(models.Model):
     #QuestionBird name 闻题鸟用户名
