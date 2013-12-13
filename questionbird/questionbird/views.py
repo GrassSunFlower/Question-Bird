@@ -37,8 +37,8 @@ def handleRequest(request):
 		return HttpResponse('看不到你看不到')
 
 
+#check whether the token is valid
 def checkSignature(request):
-	#check whether the token is valid
 	token = QB_TOKEN
 	signature = request.GET.get('signature', None)
 	timestamp = request.GET.get('timestamp', None)
@@ -92,8 +92,10 @@ def response_msg(request):
 	#处理语音消息
 	elif message_type == "voice":
 		response_msg = handle_voice(msg, user[0])
+	elif message_type == "image":
+		response_msg = handle_picture(msg, user[0])
 	else:
-		response_msg = 'Wrong Message Type!'
+		response_msg = '我看不懂你在说些什么。'
 	# 返回消息
 	return pack_text_xml(msg, response_msg)
 
@@ -101,24 +103,36 @@ def response_msg(request):
 def handle_text(msg, user):
 	content = msg.get("Content")
 	response = ""
+	#选科目
 	if user.last_oper == 100:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
 		else:
-			question = Question(
-				ques_owner=user.qbname, content='', category='',
-				question_state='已选科', answer='', answer_state='',
-				answer_satis='', answer_eva='', solver_name='')
+			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='已选科')
+			if len(questionlist) == 0:
+				question = Question(
+					ques_owner=user.qbname, content='', category='',
+					voice_id='-1', pic_id='-1', 
+					question_state='已选科', answer='', answer_state='',
+					answer_satis='', answer_eva='', solver_name='')
+			else:
+				question = questionlist[0]
+			#检测是否有因用户误操作而未完成的问题，并删除
+			unfinishedquestionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
+			if len(unfinishedquestionlist) != 0:
+				for unfinished in unfinishedquestionlist:
+					unfinished.delete()
 			if content in CATEGORY_DIC:
 				question.category = CATEGORY_DIC[content]
 				question.save()
-				user.last_oper = 101
-				response = '您的问题类型为:%s\n\r请输入您要提问的内容:' % question.category
+				user.last_oper = 110
+				response = '您的问题科目为:%s\n\r请输入您的问题(语音或文字):' % question.category
 			else:
-				response = '无效的选项，请重新输入'
+				response = '无效的选项，请输入正确的科目序号！\n\r请重新输入:'
 				user.last_oper = 100
-	elif user.last_oper == 101:
+	#提问
+	elif user.last_oper == 110:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -130,16 +144,33 @@ def handle_text(msg, user):
 			else:
 				question = questionlist[0]
 				question.content = content
-				question.question_state = '待解决'
+				question.question_state = '待加图'
+				user.last_oper = 120
+				response = "您的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。" %content
+				question.save()
+	#加图
+	elif user.last_oper == 120:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
+			if len(questionlist) == 0:
+				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 				user.last_oper = 0
+			else:
+				question = questionlist[0]
+				question.question_state = '待解决'
 				question.save()
 				qbuser = QBUser.objects.get(qbname=user.qbname)
 				qbuser.learncoin -= 2
 				qbuser.question_num += 1
 				qbuser.unsolved_num += 1
 				qbuser.save()
-				response = '提问成功，半小时内将有老师为您解答，请耐心等待~'
-	elif user.last_oper == 102:
+				response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
+				user.last_oper = 0
+	#更改昵称
+	elif user.last_oper == 200:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -160,18 +191,19 @@ def handle_text(msg, user):
 					questionlist[i].save()
 				response = '修改成功!您好，%s' % (qbuser.qbname)
 				user.last_oper = 0
-	elif user.last_oper == 103:
+	#更改密码
+	elif user.last_oper == 300:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
 		else:
 			if user.password == content:
 				response = "请输入新密码:"
-				user.last_oper = 104
+				user.last_oper = 301
 			else:
 				response = "输入错误，请重新输入:"
-				user.last_oper = 103
-	elif user.last_oper == 104:
+				user.last_oper = 300
+	elif user.last_oper == 301:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -179,8 +211,8 @@ def handle_text(msg, user):
 			global new_pass
 			new_pass = content
 			response = "请再次输入:"
-			user.last_oper = 105
-	elif user.last_oper == 105:
+			user.last_oper = 302
+	elif user.last_oper == 302:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -200,8 +232,9 @@ def handle_text(msg, user):
 				user.last_oper = 0
 			else:
 				response = "两次输入不同，请重新输入新密码:"
-				user.last_oper = 104
-	elif user.last_oper == 106:
+				user.last_oper = 301
+	#更改年级
+	elif user.last_oper == 400:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -219,8 +252,9 @@ def handle_text(msg, user):
 					user.last_oper = 0
 				else:
 					response = '无效的选项，请重新输入'
-					user.last_oper = 106
-	elif user.last_oper == 107:
+					user.last_oper = 400
+	#建议
+	elif user.last_oper == 500:
 		if user.qbname == '':
 			response = "请先登录!"
 			user.last_oper = 0
@@ -261,7 +295,7 @@ def handle_event(msg, user):
 			response = "请先登录!"
 			user.last_oper = 0
 		else:
-			response = "请选择问题类型:\n\r1.小学语文\n\r2.小学数学\n\r3.初中语文\n\r4.初中数学\n\r5.初中英语\n\r6.高中语文\n\r7.高中数学\n\r8.高中英语"
+			response = "请选择问题所属科目:\n\r1.小学语文\n\r2.小学数学\n\r3.初中语文\n\r4.初中数学\n\r5.初中英语\n\r6.高中语文\n\r7.高中数学\n\r8.高中英语"
 			user.last_oper = 100
 	elif eventKey == E_KEY_SOLVED:
 		if len(user.qbname) == 0:
@@ -295,14 +329,14 @@ def handle_event(msg, user):
 			user.last_oper = 0
 		else:
 			response = '请输入您的新昵称:'
-			user.last_oper = 102
+			user.last_oper = 200
 	elif eventKey == E_KEY_PASS:
 		if len(user.qbname) == 0:
 			response = '请先登录!'
 			user.last_oper = 0
 		else:
 			response = '请输入原密码:'
-			user.last_oper = 103
+			user.last_oper = 300
 	elif eventKey == E_KEY_GRADE:
 		#尚未登录
 		if user.qbname == '':
@@ -310,7 +344,7 @@ def handle_event(msg, user):
 			user.last_oper = 0
 		else:
 			response = "请选择新的年级:\n\r1.小学一年级\n\r2.小学二年级\n\r3.小学三年级\n\r4.小学四年级\n\r5.小学五年级\n\r6.小学六年级\n\r7.初中一年级\n\r8.初中二年级\n\r9.初中三年级\n\r10.高中一年级\n\r11.高中二年级\n\r12.高中三年级"
-			user.last_oper = 106
+			user.last_oper = 400
 	elif eventKey == E_KEY_PRODUCT:
 		if user.qbname == '':
 			response = "请先登录!"
@@ -324,7 +358,7 @@ def handle_event(msg, user):
 			user.last_oper = 0
 		else:
 			response = "尊敬的用户您好，欢迎发送任何您的意见和建议:"
-			user.last_oper = 107
+			user.last_oper = 500
 	elif eventKey == E_KEY_ACTIVITY:
 		if user.qbname == '':
 			response = "请先登录!"
@@ -341,9 +375,58 @@ def handle_event(msg, user):
 
 def handle_voice(msg, user):
 	response = ""
-	response = "您刚刚说的是不是："
-	if 'Recognition' in msg:
-		response += msg.get("Recognition")
+	if user.last_oper == 110:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='已选科')
+			if len(questionlist) == 0:
+				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
+				user.last_oper = 0
+			else:
+				question = questionlist[0]
+				question.question_state = '待加图'
+				question.voice_id = msg.get("MediaId")
+				question.content = msg.get("Recognition")
+				question.save()
+				response = "您要提的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。"%msg.get("Recognition")
+				user.last_oper = 120
+	else:
+		response = "您刚刚说的是不是："
+		if 'Recognition' in msg:
+			response += msg.get("Recognition")
+		user.last_oper = 0;
+	user.save()
+	return response
+
+
+def handle_picture(msg, user):
+	response = ""
+	if user.last_oper == 120:
+		if user.qbname == '':
+			response = "请先登录!"
+			user.last_oper = 0
+		else:
+			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
+			if len(questionlist) == 0:
+				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
+				user.last_oper = 0
+			else:
+				question = questionlist[0]
+				question.question_state = '待解决'
+				question.pic_id = msg.get("MediaId")
+				question.save()
+				qbuser = QBUser.objects.get(qbname=user.qbname)
+				qbuser.learncoin -= 2
+				qbuser.question_num += 1
+				qbuser.unsolved_num += 1
+				qbuser.save()
+				response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
+				user.last_oper = 0
+	else:
+		response = "pic url:%s\n, pic mid:%s\n" %(msg.get("PicUrl"), msg.get("MediaId"))
+		user.last_oper = 0;
 	user.save()
 	return response
 

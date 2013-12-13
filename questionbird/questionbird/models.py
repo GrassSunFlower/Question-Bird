@@ -17,10 +17,14 @@ class User(models.Model):
 class Question(models.Model):
     #问题的发起人，这里使用的是闻题鸟的账号
     ques_owner = models.CharField(max_length=50)
-    #问题的内容
+    #问题的文字内容
     content = models.CharField(max_length=200)
     #问题的科目分类
     category = models.CharField(max_length=30)
+    #语音消息的id
+    voice_id = models.CharField(max_length=100)
+    #语音消息的id
+    pic_id = models.CharField(max_length=100)
     #问题的状态：已解决或待解决
     question_state = models.CharField(max_length=10)
     #回答
