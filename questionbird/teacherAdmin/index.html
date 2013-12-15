@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Teacher Admin</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/jPages.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("div.holder").jPages({
+        containerID : "itemContainer",
+        first: '首页',
+        last: '尾页',
+        previous: '上页',
+        next: '下页',
+        perPage: 1,
+    });
+});
+</script>
+<body>
+<div class="main">
+<div class="header_full">
+  <div class="header">
+  <div class="twitter"><a href="index.html"><img src="images/twitter.gif" width="38" height="35" border="0" alt="logo" /></a><span>Follow us on Twitter</span></div>
+      <div class="clr"></div>
+      <div class="logo"><a href="index.html"><img src="images/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
+      <div class="menu">
+        <ul>
+          <li><a href="#" class="active"><span>home</span></a></li>
+          <li><a href="#"><span>portfolio</span></a></li>
+          <li><a href="#"><span>about me</span></a></li>
+          <li><a href="#"><span>contact me</span></a></li>
+        </ul>
+      </div>
+      <div class="clr"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="block_box">
+      <div class="block_box_t">
+        <div class="block_box_b">
+          <div class="but"><a href="#">查看已解决问题</a></div>
+          <h1 class="latest">最新问题</h1>
+          <ol id="itemContainer">
+            <li>
+              <div class="questionArea">
+                <div class="questionContent">
+                  <p>我想知道软件工程和计算机科学与技术专业有什么不同?哪个前途更好一些?我想知道软件工程和计算机科学与技术专业有什么不同?哪个前途更好一些?</p>
+                </div>
+                <div class="answer">
+                  <div>
+                    <ul class="nav nav-tabs" style="width:65%;">
+                      <li class="active"><a href="#text" data-toggle="tab">文字回复</a></li>
+                      <li><a href="#voice" data-toggle="tab">语音回复</a></li>
+                      <li>
+                      <div class="div1">
+                        <div class="div2">插入图片</div>
+                        <input type="file" class="inputstyle">
+                      </div>
+                      </li>
+                    </ul>
+                    <div class="tab-content">
+                      <div class="tab-pane fade in active" id="text">
+                        <textarea style="width:65%;height:100px;border: 1px solid #ddd;border-top-color: white;"></textarea>
+                      </div>
+                      <div class="tab-pane fade" id="voice"><button>语音--</button></div>
+                    </div>                  
+                  </div>
+                  <div class="right">
+                    <button type="button" class="btn btn-link" id="reply">回复</button>
+                    <button type="button" class="btn btn-link hidden" id="cancle">取消</button>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="questionArea">
+                <div class="questionContent">
+                  <p>我想知道软件工程和计算机科学与技术专业有什么不同?哪个前途更好一些?我想知道软件工程和计算机科学与技术专业有什么不同?哪个前途更好一些?</p>
+                </div>
+                <div class="answer">
+                  <div>
+                    <ul class="nav nav-tabs" style="width:65%;">
+                      <li class="active"><a href="#text" data-toggle="tab">文字回复</a></li>
+                      <li><a href="#voice" data-toggle="tab">语音回复</a></li>
+                      <li>
+                      <div class="div1">
+                        <div class="div2">插入图片</div>
+                        <input type="file" class="inputstyle">
+                      </div>
+                      </li>
+                    </ul>
+                    <div class="tab-content">
+                      <div class="tab-pane fade in active" id="text">
+                        <textarea style="width:65%;height:100px;border: 1px solid #ddd;border-top-color: white;"></textarea>
+                      </div>
+                      <div class="tab-pane fade" id="voice"><button>语音--</button></div>
+                    </div>                  
+                  </div>
+                  <div class="right">
+                    <button type="button" class="btn btn-link" id="reply">回复</button>
+                    <button type="button" class="btn btn-link hidden" id="cancle">取消</button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ol>
+            <!-- navigation panel -->
+          <div class="holder"></div>
+          
+          <div class="clr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="footer_resize">
+      <p class="rightt">© Copyright Sitename.com.  All Rights Reserved</p>
+      <div class="clr"></div>
+    </div>
+  </div>
+  <div class="clr"></div>
+</div>
+</body>
+
+</html>
