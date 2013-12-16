@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 # coding=utf-8
+
 __author__ = 'ypxtq'
 
-import hashlib, urllib2, urllib
+import hashlib, urllib2, urllib, httplib
 import xml.etree.ElementTree as ET
 import time, json
 from django.http import HttpResponse
@@ -13,15 +14,81 @@ from questionbird.models import *
 from django.shortcuts import *
 from django.template import *
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 new_pass = ''
 # Create your views here.
 @csrf_exempt
 #获取access_token的方法
-def getAccessToken():
+def get_accessToken():
     access_json = urllib.urlopen(ACCESS_URL % (APP_ID, APP_SECRET))
     resp = json.loads(access_json.read())
     return resp['access_token']
+
+#主动向用户发送文字消息
+def post_message_text(touser, text):
+	message = {
+			"touser":touser,
+			"msgtype":"text",
+			"text":{"content":text}
+	}
+	access_token = get_accessToken()
+	url = POST_URL%access_token
+	request = urllib2.Request(url, json.dumps(message, ensure_ascii=False))
+	response = urllib2.urlopen(request)
+
+#主动向用户发送图文消息
+def post_message_pic(touser, picurl, text):
+	message = {
+			"touser":touser,
+			"msgtype":"news",
+			"news":{"articles":[{"title":"问题解答", "description":text, "picurl":"http://image.baidu.com/channel#%E6%91%84%E5%BD%B1&%E5%A9%9A%E7%BA%B1%E6%91%84%E5%BD%B1&0&0"}]}
+	}
+	access_token = get_accessToken()
+	url = POST_URL%access_token
+	request = urllib2.Request(url, json.dumps(message, ensure_ascii=False))
+	response = urllib2.urlopen(request)
+
+#主动向用户发送语音消息
+def post_message_voice(touser, voiceurl):
+	message = {
+			"touser":touser,
+			"msgtype":"music",
+			"music":{
+					"title":"教师录音",
+					"description":"问题解答的补充录音",
+					"musicurl":"http://zhangmenshiting.baidu.com/data2/music/7298575/717071775600128.mp3?xcode=87517c89e8ed706585891ec932ec1c2cac0aeb26238b4679",
+					"hqmusicurl":"http://zhangmenshiting.baidu.com/data2/music/7298575/717071775600128.mp3?xcode=87517c89e8ed706585891ec932ec1c2cac0aeb26238b4679",
+					"thumb_media_id":"HEADvWi-_0hX7J8GzvJgJJoOSADzAumMtsbnVNFuIhgMwL0Jz3I-tps4bztfya9X"
+			}
+    }
+	access_token = get_accessToken()
+	url = POST_URL%access_token
+	request = urllib2.Request(url, json.dumps(message, ensure_ascii=False))
+	response = urllib2.urlopen(request)
+
+def download_file(media_id, name):
+	access_token = get_accessToken()
+	url = DOWNLOAD_URL%(media_id, access_token)
+	f = urllib.urlopen(url)
+	data = f.read()
+	dst = open(name, 'wb+')
+	dst.write(data)
+	f.close()
+	dst.close()
+
+
+# #上传文件到微信服务器
+# def upload_file(name, filetype):
+# 	access_token = get_accessToken()
+# 	url = UPLOAD_URL%(access_token, filetype)
+# 	src = open(name, 'wb+')
+# 	data = src.read()
+# 	f.close()
+# 	request = urllib2.Request(url, json.dumps(message, ensure_ascii=False))
+# 	response = urllib2.urlopen(request)
 
 
 def handleRequest(request):
@@ -113,7 +180,7 @@ def handle_text(msg, user):
 			if len(questionlist) == 0:
 				question = Question(
 					ques_owner=user.qbname, content='', category='',
-					voice_id='-1', pic_id='-1', 
+					voice_id=-1, pic_id=-1, 
 					question_state='已选科', answer='', answer_state='',
 					answer_satis='', answer_eva='', solver_name='')
 			else:
@@ -264,10 +331,7 @@ def handle_text(msg, user):
 			response = "谢谢您的建议，闻题鸟将在您的帮助下更加完善。"
 			user.last_oper = 0
 	else:
-		if content == "hi":
-			response = "yo, sb"
-		else:
-			response = "请点击下面的按钮选择相应的服务~"
+		response = "请点击下面的按钮选择相应的服务~"
 		user.last_oper = 0
 	user.save()
 	return response
@@ -278,8 +342,8 @@ def handle_event(msg, user):
 	#登录注册等事件
 	#未登录时可注册和登录
 	if eventKey == E_KEY_LOGIN and len(user.qbname) == 0:
-		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>登录</a>" % user.mmname.encode('utf-8')
-		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>注册</a>" % user.mmname.encode('utf-8')
+		login = "<a href='http://questionbird.sinaapp.com/login/?mmname=%s'>登录</a>" % user.mmname
+		register = "<a href='http://questionbird.sinaapp.com/register/?mmname=%s'>注册</a>" % user.mmname
 		response = "请选择需要的操作:\n\r%s     %s" % (login, register)
 		user.last_oper = 0
 	#已登录后只能登出
@@ -320,7 +384,7 @@ def handle_event(msg, user):
 		else:
 			qbuser = QBUser.objects.get(qbname=user.qbname)
 			response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" % (
-				qbuser.qbname.encode('utf-8'), qbuser.grade.encode('utf-8'), qbuser.learncoin, qbuser.question_num,
+				qbuser.qbname, qbuser.grade, qbuser.learncoin, qbuser.question_num,
 				qbuser.unsolved_num)
 			user.last_oper = 0
 	elif eventKey == E_KEY_NICKNAME:
@@ -385,9 +449,13 @@ def handle_voice(msg, user):
 				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 				user.last_oper = 0
 			else:
+				voice = LocalVoice(media_id=msg.get("MediaId"), path='')
+				voice.path = STORE_PATH_VOICE + voice.media_id + '.' + msg.get("Format")
+				voice.save()
+				download_file(voice.media_id, voice.path)
 				question = questionlist[0]
 				question.question_state = '待加图'
-				question.voice_id = msg.get("MediaId")
+				question.voice_id = voice.id
 				question.content = msg.get("Recognition")
 				question.save()
 				response = "您要提的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。"%msg.get("Recognition")
@@ -413,9 +481,13 @@ def handle_picture(msg, user):
 				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 				user.last_oper = 0
 			else:
+				picture = LocalPicture(media_id=msg.get("MediaId"), path='')
+				picture.path = STORE_PATH_PIC + picture.media_id + '.jpg'
+				picture.save()
+				download_file(picture.media_id, picture.path)
 				question = questionlist[0]
 				question.question_state = '待解决'
-				question.pic_id = msg.get("MediaId")
+				question.pic_id = picture.id
 				question.save()
 				qbuser = QBUser.objects.get(qbname=user.qbname)
 				qbuser.learncoin -= 2
@@ -432,7 +504,7 @@ def handle_picture(msg, user):
 
 
 # 打包消息xml，作为返回    
-def pack_text_xml(post_msg, response_msg):
+def pack_text_xml(msg, response_msg):
 	text_tpl = '''<xml>
 				<ToUserName><![CDATA[%s]]></ToUserName>
 				<FromUserName><![CDATA[%s]]></FromUserName>
@@ -442,18 +514,9 @@ def pack_text_xml(post_msg, response_msg):
 				<FuncFlag>0</FuncFlag>
 				</xml>'''
 	text_tpl = text_tpl % (
-		post_msg['FromUserName'], post_msg['ToUserName'], str(int(time.time())), 'text', response_msg)
+		msg['FromUserName'], msg['ToUserName'], str(int(time.time())), 'text', response_msg)
 	# 调换发送者和接收者，然后填入需要返回的信息到xml中
 	return text_tpl
-
-
-def test(request):
-	user = User.objects.filter(qbname='yo')
-	if len(user) == 0:
-		html = "<html><body><a href='www.baidu.com/?name=%s'>123</a></body></html>" % 'hahaha'
-	else:
-		html = "<html><body><a href='www.baidu.com/?name=%s'>123</a></body></html>" % user[0].password
-	return HttpResponse(html)
 
 
 def solved(request):
@@ -573,3 +636,19 @@ def login_teacher(request):
 			return render_to_response('login_teacher.html', {'state': 'wrong'})
 		else:
 			return render_to_response('login_teacher.html', {'state': 'unknown'})
+
+
+def test(request):
+	# access_token = get_accessToken()
+	# media_id = 'HEADvWi-_0hX7J8GzvJgJJoOSADzAumMtsbnVNFuIhgMwL0Jz3I-tps4bztfya9X'
+	# url = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s'%(access_token,media_id)
+	# name = STORE_PATH_PIC + '1.jpg'
+	# download_file(media_id, name)
+	html = "<html><body><a href='http://www.baidu.com'>123</a></body></html>"
+	touser = 'oUJnEt9HWfBYQjtPDdOnIpWB2zSk'
+	touser1 = 'oUJnEt3IE3K9Chy7mEs9fO5zu1_Q'
+	text = "Helloworld"
+	#post_message_pic(touser,123, text)
+	post_message_voice(touser, 123)
+	return HttpResponse(html)
+

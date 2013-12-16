@@ -22,9 +22,9 @@ class Question(models.Model):
     #问题的科目分类
     category = models.CharField(max_length=30)
     #语音消息的id
-    voice_id = models.CharField(max_length=100)
+    voice_id = models.IntegerField()
     #语音消息的id
-    pic_id = models.CharField(max_length=100)
+    pic_id = models.IntegerField()
     #问题的状态：已解决或待解决
     question_state = models.CharField(max_length=10)
     #回答
@@ -70,3 +70,17 @@ class Teacher(models.Model):
 class RequestCode(models.Model):
     #邀请码
     request_code = models.CharField(max_length=30)
+
+#图片的类
+class LocalPicture(models.Model):
+    #微信储存的媒体id
+    media_id = models.CharField(max_length=100)
+    #本地储存路径
+    path = models.CharField(max_length=100)
+
+#语音的类
+class LocalVoice(models.Model):
+    #微信储存的媒体id
+    media_id = models.CharField(max_length=100)
+    #本地储存路径
+    path = models.CharField(max_length=100)  
