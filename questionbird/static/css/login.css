@@ -1,6 +1,8 @@
 .container {
 	padding: 0;
 	margin: 0;
+	width: 100%;
+	height: 100%;
 }
 #login, #register {
 	position: absolute;
@@ -10,19 +12,29 @@
 .form-signin {
 	position: absolute;
 	top: 60%;
-	left: 15%;
-	right: 15%;
+	left: 5%;
+	right: 5%;
 	height: 30%;
 	margin: 0;
 }
-.form-control {
-	height: 33%;
-	font-size: 40px;
+.input-group {
+	width: 100%;
+}
+.input-group-addon, .form-control {
+	height: 100%;
+	font-size: 25px;
 	padding: 0;
-	padding-left: 10px;
+	border: 0;
+	padding-left: 15px;
+}
+.input-group-addon {
+	padding: 8px 15px;
 }
 #login-button, #register-button {
-	height: 33%;
-	font-size: 45px;
-	padding: 0;
+	margin-top: 2%;
+	font-size: 25px;
+}
+#info {
+	font-size:22px;
+	color:red;
 }

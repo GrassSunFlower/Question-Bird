@@ -6,22 +6,19 @@
   <link rel="stylesheet" href="/site_media/css/login.css">
   <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
   <script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
-  <title>闻题鸟注册页面</title>
+  <title>闻题鸟教师端登录页面</title>
 </head>
 <body>
   <div class="container">
-    <div id="register">
+    <div id="login">
       <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
-      <form class="form-signin" action="/register/" method="post">
-        <input hidden name='mmname' value={{ mmname }}>
-        {% if state == "success" %}
-          <div id='info'>注册成功!已自动登陆。</div>
-        {% elif state == "existed" %}
-          <div id='info'>注册失败，用户已存在!</div>
+      <form class="form-signin" action="/login_teacher/" method="post">
+        {% if state == "nonexisted" %}
+          <div id='info'>登录失败，用户不存在!</div>
         {% elif state == "null" %}
           <div id='info'>账号和密码不能为空!</div>
-        {% elif state == "different" %}
-          <div id='info'>两次输入的密码不相同!</div>
+        {% elif state == "wrong" %}
+          <div id='info'>密码错误!</div>
         {% else %}
         {% endif %}
         <div class="input-group">
@@ -32,11 +29,7 @@
           <span class="input-group-addon">密码</span>
           <input type="password" name="password" class="form-control">
         </div>
-        <div class="input-group">
-          <span class="input-group-addon">确认</span>
-          <input type="password" name="confirm" class="form-control">
-        </div>
-        <button id="register-button" class="btn btn-lg btn-primary btn-block" type="submit">注册</button>
+        <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
       </form>
     </div>
   </div>

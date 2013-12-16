@@ -2,72 +2,35 @@
 <head>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="/site_media/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/site_media/css/questionlist.css" />
 	<script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
 	<script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
 	<title>已解决问题</title>
 </head>
 <body>
-	<div class="list-group">
-		<a href="#" class="list-group-item">
-			<h4 class="list-group-item-heading">伟哥是什么<span class="badge pull-right">小学语文</span></h4>
-			<p class="list-group-item-text">伟哥(viagra，中文名：万艾可)是由美国辉瑞研制开发的一种口服治疗ED的药物，用于治疗勃起功能障碍以及早泄，对于勃起功能减退与早泄有非常显著的改善。</p>
-		</a>
-		<a href="#" class="list-group-item">
-			<h4 class="list-group-item-heading">伟哥多少钱一斤<span class="badge pull-right">初中数学</span></h4>
-			<p class="list-group-item-text">50还是一百多元一盒吧，挺贵的。是药三分毒，还是慎用。</p>
-		</a>
-		<a href="#" class="list-group-item">
-			<h4 class="list-group-item-heading">伟哥多少钱一斤的英文怎么说<span class="badge pull-right">高中英语</span></h4>
-			<p class="list-group-item-text">Viagra how much a pound</p>
-		</a>
-	</div>
-
-	<div class="panel panel-info">
-		<div class="panel-heading">
-			<h3 class="panel-title">
-				伟哥是什么
-				<span class="pull-right">已评价</span>
-				<span class="pull-right">&nbsp;&nbsp;</span>
-				<span class="badge pull-right">小学语文</span>
-			</h3>
-		</div>
-		<div class="panel-body">
-			伟哥(viagra，中文名：万艾可)是由美国辉瑞研制开发的一种口服治疗ED的药物，用于治疗勃起功能障碍以及早泄，对于勃起功能减退与早泄有非常显著的改善。
- 		</div>
- 		<div class="panel-footer">
- 			good!<span class="pull-right">满意</span>
- 		</div>
-	</div>
-	<div class="panel panel-info">
-		<div class="panel-heading">
-			<h3 class="panel-title">
-				伟哥多少钱一斤
-				<a class="pull-right" data-toggle="modal" data-target="#myModal">请评价</a>
-				<span class="pull-right">&nbsp;&nbsp;</span>
-				<span class="badge pull-right">初中数学</span>
-			</h3>
-		</div>
-		<div class="panel-body">
-			50还是一百多元一盒吧，挺贵的。是药三分毒，还是慎用。
- 		</div>
-	</div>
-	<div class="panel panel-info">
-		<div class="panel-heading">
-			<h3 class="panel-title">
-				伟哥多少钱一斤的英文怎么说
-				<span class="pull-right">已评价</span>
-				<span class="pull-right">&nbsp;&nbsp;</span>
-				<span class="badge pull-right">高中英语</span>
-			</h3>
-		</div>
-		<div class="panel-body">
-			Viagra how much a pound
- 		</div>
- 		<div class="panel-footer">
- 			sb!<span class="pull-right">不满意</span>
- 		</div>
-	</div>
-
+	<h3>{{qbname}}的已解决问题集合</h3>
+	{% if questions %}
+		{% for question in questions %}
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						{{question.content}}
+						<span class="pull-right">{{question.answer_state}}</span>
+						<span class="pull-right">&nbsp;&nbsp;</span>
+						<span class="badge pull-right" style="font-size:40px">{{question.category}}</span>
+					</h3>
+				</div>
+				<div class="panel-body">
+					{{question.answer}}
+		 		</div>
+		 		<div class="panel-footer">
+		 			{{question.answer_eva}}<span class="pull-right">{{question.answer_satis}}</span>
+		 		</div>
+			</div>
+		{% endfor %}
+	{% else %}
+		<div>没有已解决的问题</div>
+	{% endif %}
 	<!-- Modal -->
 	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
