@@ -135,7 +135,7 @@ def parse_msg(rootElem):
 
 
 def create_user(mmname):
-	user = User(mmname=mmname, qbname='', password='', last_oper=0)
+	user = QBUser(mmname=mmname, last_oper=0, learncoin=200, question_num=0, unsolved_num=0,grade='')
 	user.save()
 
 
@@ -145,10 +145,10 @@ def response_msg(request):
 	# 将文本进行解析,得到请求的数据
 	msg = parse_msg(ET.fromstring(rawStr))
 	mmname = msg["FromUserName"]
-	user = User.objects.filter(mmname=mmname)
+	user = QBUser.objects.filter(mmname=mmname)
 	if len(user) == 0:
 		create_user(mmname)
-	user = User.objects.filter(mmname=mmname)
+	user = QBUser.objects.filter(mmname=mmname)
 	response_msg = ""
 	#message_type = msg.get("MsgType")
 	message_type = msg["MsgType"]
@@ -174,136 +174,94 @@ def handle_text(msg, user):
 	response = ""
 	#选科目
 	if user.last_oper == 100:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
+		questionlist = Question.objects.filter(ques_owner=user.mmname, question_state='已选科')
+		if len(questionlist) == 0:
+			question = Question(
+				ques_owner=user.mmname, content='', category='',
+				ques_image='', ques_voice='', 
+				question_state='已选科', answer='', answer_state='',
+				answer_satis='', answer_eva='', solver_name='')
 		else:
-			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='已选科')
-			if len(questionlist) == 0:
-				question = Question(
-					ques_owner=user.qbname, content='', category='',
-					ques_image='', ques_voice='', 
-					question_state='已选科', answer='', answer_state='',
-					answer_satis='', answer_eva='', solver_name='')
-			else:
-				question = questionlist[0]
-			#检测是否有因用户误操作而未完成的问题，并删除
-			unfinishedquestionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
-			if len(unfinishedquestionlist) != 0:
-				for unfinished in unfinishedquestionlist:
-					unfinished.delete()
-			if content in CATEGORY_DIC:
-				question.category = CATEGORY_DIC[content]
-				question.save()
-				user.last_oper = 110
-				response = '您的问题科目为:%s\n\r请输入您的问题(语音或文字):' % question.category
-			else:
-				response = '无效的选项，请输入正确的科目序号！\n\r请重新输入:'
-				user.last_oper = 100
+			question = questionlist[0]
+		#检测是否有因用户误操作而未完成的问题，并删除
+		unfinishedquestionlist = Question.objects.filter(ques_owner=user.mmname, question_state='待加图')
+		if len(unfinishedquestionlist) != 0:
+			for unfinished in unfinishedquestionlist:
+				unfinished.delete()
+		if content in CATEGORY_DIC:
+			question.category = CATEGORY_DIC[content]
+			question.save()
+			user.last_oper = 110
+			response = '您的问题科目为:%s\n\r请输入您的问题(语音或文字):' % question.category
+		else:
+			response = '无效的选项，请输入正确的科目序号！\n\r请重新输入:'
+			user.last_oper = 100
 	#提问
 	elif user.last_oper == 110:
-		if user.qbname == '':
-			response = "请先登录!"
+		questionlist = Question.objects.filter(ques_owner=user.mmname, question_state='已选科')
+		if len(questionlist) == 0:
+			response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 			user.last_oper = 0
 		else:
-			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='已选科')
-			if len(questionlist) == 0:
-				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
-				user.last_oper = 0
-			else:
-				question = questionlist[0]
-				question.content = content
-				question.question_state = '待加图'
-				user.last_oper = 120
-				response = "您的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。" %content
-				question.save()
+			question = questionlist[0]
+			question.content = content
+			question.question_state = '待加图'
+			user.last_oper = 120
+			response = "您的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。" %content
+			question.save()
 	#加图
 	elif user.last_oper == 120:
-		if user.qbname == '':
-			response = "请先登录!"
+		questionlist = Question.objects.filter(ques_owner=user.mmname, question_state='待加图')
+		if len(questionlist) == 0:
+			response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 			user.last_oper = 0
 		else:
-			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
-			if len(questionlist) == 0:
-				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
-				user.last_oper = 0
-			else:
-				question = questionlist[0]
-				question.question_state = '待解决'
-				question.save()
-				qbuser = QBUser.objects.get(qbname=user.qbname)
-				qbuser.learncoin -= 2
-				qbuser.question_num += 1
-				qbuser.unsolved_num += 1
-				qbuser.save()
-				response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
-				user.last_oper = 0
-	#更改昵称
-	elif user.last_oper == 200:
-		if user.qbname == '':
-			response = "请先登录!"
+			question = questionlist[0]
+			question.question_state = '待解决'
+			question.save()
+			user.learncoin -= 2
+			user.question_num += 1
+			user.unsolved_num += 1
 			user.last_oper = 0
-		else:
-			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
-			questionlist = Question.objects.filter(ques_owner=user.qbname)
-			if len(qbuserlist) == 0:
-				response = "未知的错误!请重新点击'更改昵称'按钮修改您的昵称"
-				user.last_oper = 0
-			else:
-				qbuser = qbuserlist[0]
-				qbuser.qbname = content
-				qbuser.save()
-				user.qbname = content
-				user.save()
-				for i in range(0, len(questionlist)):
-					questionlist[i].ques_owner = content
-					questionlist[i].save()
-				response = '修改成功!您好，%s' % (qbuser.qbname)
-				user.last_oper = 0
-	#更改密码
-	elif user.last_oper == 300:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
-			qbuser = qbuserlist[0]
-			qbuser.password = content
-			qbuser.save()
-			user.password = content
-			user.save()
-			response = "修改成功!"
-			user.last_oper = 0
+			response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
+	# #更改昵称
+	# elif user.last_oper == 200:
+	# 	questionlist = Question.objects.filter(ques_owner=user.mmname)
+	# 	if len(qbuserlist) == 0:
+	# 		response = "未知的错误!请重新点击'更改昵称'按钮修改您的昵称"
+	# 		user.last_oper = 0
+	# 	else:
+	# 		user.mmname = content
+	# 		for i in range(0, len(questionlist)):
+	# 			questionlist[i].ques_owner = content
+	# 			questionlist[i].save()
+	# 		response = '修改成功!您好，%s' % (user.mmname)
+	# 		user.last_oper = 0
+	# #更改密码
+	# elif user.last_oper == 300:
+	# 	qbuserlist = QBUser.objects.filter(mmname=user.mmname)
+	# 	qbuser = qbuserlist[0]
+	# 	qbuser.password = content
+	# 	qbuser.save()
+	# 	user.password = content
+	# 	response = "修改成功!"
+	# 	user.last_oper = 0
+	# 	user.save()
 	#更改年级
 	elif user.last_oper == 400:
-		if user.qbname == '':
-			response = "请先登录!"
+		if content in CATEGORY_GRADE_DIC:
+			user.grade = CATEGORY_GRADE_DIC[content]
+			response = '修改成功!'
 			user.last_oper = 0
 		else:
-			qbuserlist = QBUser.objects.filter(qbname=user.qbname)
-			if len(qbuserlist) == 0:
-				response = "未知的错误!请重新点击'更改年级'按钮修改您的年级"
-				user.last_oper = 0
-			else:
-				if content in CATEGORY_GRADE_DIC:
-					qbuser = qbuserlist[0]
-					qbuser.grade = CATEGORY_GRADE_DIC[content]
-					qbuser.save()
-					response = '修改成功!'
-					user.last_oper = 0
-				else:
-					response = '无效的选项，请重新输入'
-					user.last_oper = 400
+			response = '无效的选项，请重新输入'
+			user.last_oper = 400
 	#建议
 	elif user.last_oper == 500:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			suggestion = Suggestion(content=content)
-			suggestion.save()
-			response = "谢谢您的建议，闻题鸟将在您的帮助下更加完善。"
-			user.last_oper = 0
+		suggestion = Suggestion(content=content)
+		suggestion.save()
+		response = "谢谢您的建议，闻题鸟将在您的帮助下更加完善。"
+		user.last_oper = 0
 	else:
 		response = "请点击下面的按钮选择相应的服务~"
 		user.last_oper = 0
@@ -313,95 +271,51 @@ def handle_text(msg, user):
 
 def handle_event(msg, user):
 	eventKey = msg.get("EventKey")
-	#登录注册等事件
-	#未登录时可注册和登录
-	if eventKey == E_KEY_LOGIN and len(user.qbname) == 0:
-		login = "<a href='%slogin/?mmname=%s'>登录</a>" % (SERVER_URL, user.mmname)
-		register = "<a href='%sregister/?mmname=%s'>注册</a>" % (SERVER_URL, user.mmname)
-		response = "请选择需要的操作:\n\r%s     %s" % (login, register)
-		user.last_oper = 0
-	#已登录后只能登出
-	elif eventKey == E_KEY_LOGIN:
-		user.qbname = ''
-		user.password = ''
-		user.save()
-		user.last_oper = 0
-		response = '登出成功!'
-	elif eventKey == E_KEY_ASK:
-		#尚未登录
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			response = "请选择问题所属科目:\n\r1.小学语文\n\r2.小学数学\n\r3.初中语文\n\r4.初中数学\n\r5.初中英语\n\r6.高中语文\n\r7.高中数学\n\r8.高中英语"
-			user.last_oper = 100
+	# #登录注册等事件
+	# #未登录时可注册和登录
+	# if eventKey == E_KEY_LOGIN and len(user.mmname) == 0:
+	# 	login = "<a href='%slogin/?mmname=%s'>登录</a>" % (SERVER_URL, user.mmname)
+	# 	register = "<a href='%sregister/?mmname=%s'>注册</a>" % (SERVER_URL, user.mmname)
+	# 	response = "请选择需要的操作:\n\r%s     %s" % (login, register)
+	# 	user.last_oper = 0
+	# #已登录后只能登出
+	# elif eventKey == E_KEY_LOGIN:
+	# 	user.mmname = ''
+	# 	user.password = ''
+	# 	user.save()
+	# 	user.last_oper = 0
+	# 	response = '登出成功!'
+	if eventKey == E_KEY_ASK:
+		response = "请选择问题所属科目:\n\r1.小学语文\n\r2.小学数学\n\r3.初中语文\n\r4.初中数学\n\r5.初中英语\n\r6.高中语文\n\r7.高中数学\n\r8.高中英语"
+		user.last_oper = 100
 	elif eventKey == E_KEY_SOLVED:
-		if len(user.qbname) == 0:
-			response = '请先登录!'
-			user.last_oper = 0
-		else:
-			response = "已解决问题的列表页面已为您准备好，请<a href='%ssolved/?mmname=%s'>点击</a>" % (SERVER_URL, user.mmname)
-			user.last_oper = 0
+		response = "已解决问题的列表页面已为您准备好，请<a href='%ssolved/?mmname=%s'>点击</a>" % (SERVER_URL, user.mmname)
+		user.last_oper = 0
 	elif eventKey == E_KEY_UNSOLVED:
-		if len(user.qbname) == 0:
-			response = '请先登录!'
-			user.last_oper = 0
-		else:
-			response = "待解决问题的列表页面已为您准备好，请<a href='%sunsolved/?mmname=%s'>点击</a>" % (SERVER_URL, user.mmname)
-			user.last_oper = 0
+		response = "待解决问题的列表页面已为您准备好，请<a href='%sunsolved/?mmname=%s'>点击</a>" % (SERVER_URL, user.mmname)
+		user.last_oper = 0
 	elif eventKey == E_KEY_INFO:
-		if len(user.qbname) == 0:
-			response = '请先登录!'
-			user.last_oper = 0
-		else:
-			qbuser = QBUser.objects.get(qbname=user.qbname)
-			response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" % (
-				qbuser.qbname, qbuser.grade, qbuser.learncoin, qbuser.question_num,
-				qbuser.unsolved_num)
-			user.last_oper = 0
-	elif eventKey == E_KEY_NICKNAME:
-		if len(user.qbname) == 0:
-			response = '请先登录!'
-			user.last_oper = 0
-		else:
-			response = '请输入您的新昵称:'
-			user.last_oper = 200
-	elif eventKey == E_KEY_PASS:
-		if len(user.qbname) == 0:
-			response = '请先登录!'
-			user.last_oper = 0
-		else:
-			response = '请输入新密码:'
-			user.last_oper = 300
+		response = "您的个人信息:\n\r昵称:%s\n\r年级:%s\n\r剩余学习币:%d\n\r已提问次数:%d\n\r待解决问题数:%d" % (
+			user.mmname, user.grade, user.learncoin, user.question_num, user.unsolved_num)
+		user.last_oper = 0
+	# elif eventKey == E_KEY_NICKNAME:
+	# 	response = '请输入您的新昵称:'
+	# 	user.last_oper = 200
+	# elif eventKey == E_KEY_PASS:
+	# 		response = '请输入新密码:'
+	# 		user.last_oper = 300
 	elif eventKey == E_KEY_GRADE:
-		#尚未登录
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			response = "请选择新的年级:\n\r1.小学一年级\n\r2.小学二年级\n\r3.小学三年级\n\r4.小学四年级\n\r5.小学五年级\n\r6.小学六年级\n\r7.初中一年级\n\r8.初中二年级\n\r9.初中三年级\n\r10.高中一年级\n\r11.高中二年级\n\r12.高中三年级"
-			user.last_oper = 400
+		response = "请选择新的年级:\n\r1.小学一年级\n\r2.小学二年级\n\r3.小学三年级\n\r4.小学四年级\n\r5.小学五年级\n\r6.小学六年级\n\r7.初中一年级\n\r8.初中二年级\n\r9.初中三年级\n\r10.高中一年级\n\r11.高中二年级\n\r12.高中三年级"
+		user.last_oper = 400
 	elif eventKey == E_KEY_PRODUCT:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			response = "闻题鸟微信服务号V1.0由一盆小铜钱小组为您敬上。了解更多我们的信息请致电15959542364。"
-			user.last_oper = 0
+		response = "闻题鸟微信服务号V1.0由一盆小铜钱小组为您敬上。了解更多我们的信息请致电15959542364。"
+		user.last_oper = 0
 	elif eventKey == E_KEY_FEEDBACK:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			response = "尊敬的用户您好，欢迎发送任何您的意见和建议:"
-			user.last_oper = 500
+		response = "尊敬的用户您好，欢迎发送任何您的意见和建议:"
+		user.last_oper = 500
 	elif eventKey == E_KEY_ACTIVITY:
-		if user.qbname == '':
-			response = "请先登录!"
-			user.last_oper = 0
-		else:
-			response = "暂时没有活动信息哦，敬请期待我们接下来推出的活动。"
-			user.last_oper = 0
+		response = "暂时没有活动信息哦，敬请期待我们接下来推出的活动。"
+		user.last_oper = 0
 	else:
 		#response = "Wrong Message Key!"
 		exit(0)
@@ -412,25 +326,21 @@ def handle_event(msg, user):
 def handle_voice(msg, user):
 	response = ""
 	if user.last_oper == 110:
-		if user.qbname == '':
-			response = "请先登录!"
+		questionlist = Question.objects.filter(ques_owner=user.mmname, question_state='已选科')
+		if len(questionlist) == 0:
+			response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 			user.last_oper = 0
 		else:
-			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='已选科')
-			if len(questionlist) == 0:
-				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
-				user.last_oper = 0
-			else:
-				media_id=msg.get("MediaId")
-				path = STORE_PATH + media_id + '.' + msg.get("Format")
-				download_file(media_id, path)
-				question = questionlist[0]
-				question.question_state = '待加图'
-				question.ques_voice = "\\site_media\\files\\"+media_id+'.'+msg.get("Format")
-				question.content = msg.get("Recognition")
-				question.save()
-				response = "您要提的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。"%msg.get("Recognition")
-				user.last_oper = 120
+			media_id=msg.get("MediaId")
+			path = STORE_PATH + media_id + '.' + msg.get("Format")
+			download_file(media_id, path)
+			question = questionlist[0]
+			question.question_state = '待加图'
+			question.ques_voice = "\\site_media\\files\\"+media_id+'.'+msg.get("Format")
+			question.content = msg.get("Recognition")
+			question.save()
+			response = "您要提的问题是：%s\n\r您还可以选择上传一张图片，也可直接回复任意文字消息结束本次提问。"%msg.get("Recognition")
+			user.last_oper = 120
 	else:
 		response = "您刚刚说的是不是："
 		if 'Recognition' in msg:
@@ -443,29 +353,23 @@ def handle_voice(msg, user):
 def handle_picture(msg, user):
 	response = ""
 	if user.last_oper == 120:
-		if user.qbname == '':
-			response = "请先登录!"
+		questionlist = Question.objects.filter(ques_owner=user.mmname, question_state='待加图')
+		if len(questionlist) == 0:
+			response = "未知的错误!请重新点击'我要提问'按钮开始提问"
 			user.last_oper = 0
 		else:
-			questionlist = Question.objects.filter(ques_owner=user.qbname, question_state='待加图')
-			if len(questionlist) == 0:
-				response = "未知的错误!请重新点击'我要提问'按钮开始提问"
-				user.last_oper = 0
-			else:
-				media_id=msg.get("MediaId")
-				path = STORE_PATH + media_id + '.jpg'
-				download_file(media_id, path)
-				question = questionlist[0]
-				question.question_state = '待解决'
-				question.ques_image = "\\site_media\\files\\"+media_id+'.jpg'
-				question.save()
-				qbuser = QBUser.objects.get(qbname=user.qbname)
-				qbuser.learncoin -= 2
-				qbuser.question_num += 1
-				qbuser.unsolved_num += 1
-				qbuser.save()
-				response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
-				user.last_oper = 0
+			media_id=msg.get("MediaId")
+			path = STORE_PATH + media_id + '.jpg'
+			download_file(media_id, path)
+			question = questionlist[0]
+			question.question_state = '待解决'
+			question.ques_image = "\\site_media\\files\\"+media_id+'.jpg'
+			question.save()
+			user.learncoin -= 2
+			user.question_num += 1
+			user.unsolved_num += 1
+			response = "提问成功，半小时内将有老师为您解答，请耐心等待~"
+			user.last_oper = 0
 	else:
 		response = "pic url:%s\n, pic mid:%s\n" %(msg.get("PicUrl"), msg.get("MediaId"))
 		user.last_oper = 0;
@@ -492,97 +396,85 @@ def pack_text_xml(msg, response_msg):
 def solved(request):
 	if request.method == "GET" and 'mmname' in request.GET:
 		mmname = request.GET['mmname']
-		userlist = User.objects.filter(mmname=mmname)
-		qbname = userlist[0].qbname
-		qbuserlist = QBUser.objects.filter(qbname=qbname)
-		if len(qbuserlist) != 0:
-			questionlist = Question.objects.filter(ques_owner=qbname, question_state="已解决")
-			return render_to_response('questionsolvedlist.html', {'qbname': qbname, 'questions': questionlist})
-		else:
-			html = "<html><body><h3>请登录!</h3></body></html>"
-			return HttpResponse(html)
+		userlist = QBUser.objects.filter(mmname=mmname)
+		questionlist = Question.objects.filter(ques_owner=mmname, question_state="已解决")
+		return render_to_response('questionsolvedlist.html', {'mmname': mmname, 'questions': questionlist})
 	else:
-		html = "<html><body><h3>请登录!</h3></body></html>"
+		html = "<html><body><h3>无效的访问!</h3></body></html>"
 		return HttpResponse(html)
 
 
 def unsolved(request):
 	if request.method == "GET" and 'mmname' in request.GET:
 		mmname = request.GET['mmname']
-		userlist = User.objects.filter(mmname=mmname)
-		qbname = userlist[0].qbname
-		qbuserlist = QBUser.objects.filter(qbname=qbname)
-		if len(qbuserlist) != 0:
-			questionlist = Question.objects.filter(ques_owner=qbname, question_state="待解决")
-			return render_to_response('questiontobesolvelist.html', {'qbname': qbname, 'questions': questionlist})
-		else:
-			html = "<html><body><h3>请登录!</h3></body></html>"
-			return HttpResponse(html)
+		userlist = QBUser.objects.filter(mmname=mmname)
+		questionlist = Question.objects.filter(ques_owner=mmname, question_state="待解决")
+		return render_to_response('questiontobesolvelist.html', {'mmname': mmname, 'questions': questionlist})
 	else:
-		html = "<html><body><h3>请登录!</h3></body></html>"
+		html = "<html><body><h3>无效的访问!</h3></body></html>"
 		return HttpResponse(html)
 
 
-def register(request):
-	if request.method == "GET" and 'mmname' in request.GET:
-		mmname = request.GET['mmname']
-		return render_to_response('register.html', {'mmname': mmname, 'state': 'unknown'})
-	elif request.method == "POST" and 'mmname' in request.POST:
-		mmname = request.POST['mmname']
-		qbname = request.POST['name']
-		password = request.POST['password']
-		confirm = request.POST['confirm']
-		if qbname == '' or password == '':
-			return render_to_response('register.html', {'mmname': mmname, 'state': 'null'})
-		if password != confirm:
-			return render_to_response('register.html', {'mmname': mmname, 'state': 'different'})
-		qbuserlist = QBUser.objects.filter(qbname=qbname)
-		if len(qbuserlist) == 0:
-			qbuser = QBUser(qbname=qbname, password=password, learncoin=200, question_num=0, unsolved_num=0,
-							grade="小学一年级")
-			qbuser.save()
-			userlist = User.objects.filter(mmname=mmname)
-			user = userlist[0]
-			user.qbname = request.POST['name']
-			user.password = request.POST['password']
-			user.last_oper = 0
-			user.save()
-			return render_to_response('register.html', {'mmname': mmname, 'state': 'success'})
-		else:
-			return render_to_response('register.html', {'mmname': mmname, 'state': 'existed'})
-	else:
-		html = "<html><body><h3>无效的访问</h3></body></html>"
-		return HttpResponse(html)
+# def register(request):
+# 	if request.method == "GET" and 'mmname' in request.GET:
+# 		mmname = request.GET['mmname']
+# 		return render_to_response('register.html', {'mmname': mmname, 'state': 'unknown'})
+# 	elif request.method == "POST" and 'mmname' in request.POST:
+# 		mmname = request.POST['mmname']
+# 		mmname = request.POST['name']
+# 		password = request.POST['password']
+# 		confirm = request.POST['confirm']
+# 		if mmname == '' or password == '':
+# 			return render_to_response('register.html', {'mmname': mmname, 'state': 'null'})
+# 		if password != confirm:
+# 			return render_to_response('register.html', {'mmname': mmname, 'state': 'different'})
+# 		userlist = QBUser.objects.filter(mmname=mmname)
+# 		if len(qbuserlist) == 0:
+# 			qbuser = QBUser(mmname=mmname, password=password, learncoin=200, question_num=0, unsolved_num=0,
+# 							grade="小学一年级")
+# 			qbuser.save()
+# 			userlist = User.objects.filter(mmname=mmname)
+# 			user = userlist[0]
+# 			user.mmname = request.POST['name']
+# 			user.password = request.POST['password']
+# 			user.last_oper = 0
+# 			user.save()
+# 			return render_to_response('register.html', {'mmname': mmname, 'state': 'success'})
+# 		else:
+# 			return render_to_response('register.html', {'mmname': mmname, 'state': 'existed'})
+# 	else:
+# 		html = "<html><body><h3>无效的访问</h3></body></html>"
+# 		return HttpResponse(html)
 
 
-def login(request):
-	if request.method == "GET" and 'mmname' in request.GET:
-		mmname_value = request.GET['mmname']
-		return render_to_response('login.html', {'mmname': mmname_value})
-	elif request.method == "POST" and 'mmname' in request.POST:
-		mmname = request.POST['mmname']
-		qbname = request.POST['name']
-		password = request.POST['password']
-		if qbname == '' or password == '':
-			return render_to_response('login.html', {'mmname': mmname, 'state': 'null'})
-		qbuserlist = QBUser.objects.filter(qbname=qbname)
-		if len(qbuserlist) != 0:
-			qbuser = qbuserlist[0]
-			if qbuser.qbname == qbname and qbuser.password == password:
-				userlist = User.objects.filter(mmname=mmname)
-				user = userlist[0]
-				user.qbname = qbname
-				user.password = password
-				user.last_oper = 0
-				user.save()
-				return render_to_response('login.html', {'mmname': mmname, 'state': 'success'})
-			else:
-				return render_to_response('login.html', {'mmname': mmname, 'state': 'fail'})
-		else:
-			return render_to_response('login.html', {'mmname': mmname, 'state': 'unexisted'})
-	else:
-		html = "<html><body><h3>无效的访问</h3></body></html>"
-		return HttpResponse(html)
+# def login(request):
+# 	if request.method == "GET" and 'mmname' in request.GET:
+# 		mmname_value = request.GET['mmname']
+# 		return render_to_response('login.html', {'mmname': mmname_value})
+# 	elif request.method == "POST" and 'mmname' in request.POST:
+# 		mmname = request.POST['mmname']
+# 		mmname = request.POST['name']
+# 		password = request.POST['password']
+# 		if mmname == '' or password == '':
+# 			return render_to_response('login.html', {'mmname': mmname, 'state': 'null'})
+# 		qbuserlist = QBUser.objects.filter(mmname=mmname)
+# 		if len(qbuserlist) != 0:
+# 			qbuser = qbuserlist[0]
+# 			if qbuser.mmname == mmname and qbuser.password == password:
+# 				userlist = User.objects.filter(mmname=mmname)
+# 				user = userlist[0]
+# 				user.mmname = mmname
+# 				user.password = password
+# 				user.last_oper = 0
+# 				user.save()
+# 				return render_to_response('login.html', {'mmname': mmname, 'state': 'success'})
+# 			else:
+# 				return render_to_response('login.html', {'mmname': mmname, 'state': 'fail'})
+# 		else:
+# 			return render_to_response('login.html', {'mmname': mmname, 'state': 'unexisted'})
+# 	else:
+# 		html = "<html><body><h3>无效的访问</h3></body></html>"
+# 		return HttpResponse(html)
 
 
 def index(request):
@@ -600,7 +492,7 @@ def test(request):
 	touser = 'oUJnEt9HWfBYQjtPDdOnIpWB2zSk'
 	# touser1 = 'oUJnEt3IE3K9Chy7mEs9fO5zu1_Q'
 	text = "Helloworld"
-	user = User.objects.filter(qbname="123")
+	user = QBUser.objects.filter(mmname="123")
 	if user[0].mmname != touser:
 		html = "<html><body><a href='http://www.baidu.com'>%s</a></body></html>"%user[0].mmname
 		post_message_text(user[0].mmname,"您的问题已解决。")
@@ -717,7 +609,7 @@ def answer(request):
 		question.solver_name = request.POST['solver']
 		question.question_state = "已解决"
 		question.save()
-		user = User.objects.filter(qbname=question.ques_owner)
+		user = QBUser.objects.filter(mmname=question.ques_owner)
 		text = "您的解答是："+question.answer
 		post_message_text(user[0].mmname.encode('utf-8'),text.encode('utf-8'))
 		return HttpResponse(simplejson.dumps({"state":'success',"content":question.content,'ques_image':question.ques_image,'ques_voice':question.ques_voice,'category':question.category,'question_state':question.question_state,'answer':question.answer,'answer_image':question.answer_image,'answer_voice':question.answer_voice,'answer_state':question.answer_state,'answer_satis':question.answer_satis,'answer_eva':question.answer_eva,'solver_name':question.solver_name}),mimetype='application/json')
