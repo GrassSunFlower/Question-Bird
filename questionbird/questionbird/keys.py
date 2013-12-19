@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # coding=utf-8
 
+#运行的服务器网址
+SERVER_URL= "http://59.66.149.157/"
 #token值
 QB_TOKEN = "questionbird"
 #AppId值 在微信公共平台管理页获得
@@ -9,6 +11,15 @@ APP_ID = "wx2a405d14abedb32c"
 APP_SECRET = "a4ddbe11cf22ceac471e10bfb8de3836"
 #获取access_token的url
 ACCESS_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s"
+#图片储存路径
+STORE_PATH = 'F:\\pythonproject\\questionbird\\static\\files\\'
+#上传url
+UPLOAD_URL = 'http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s'
+#下载url
+DOWNLOAD_URL = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s'
+#主动发送消息post的url
+POST_URL = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s'
+
 
 #登陆、注册、登出操作的eventkey值
 E_KEY_LOGIN = "Q_login_regis_logout"

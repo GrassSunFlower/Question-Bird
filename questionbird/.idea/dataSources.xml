@@ -5,7 +5,7 @@
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1:3306/questionbird</jdbc-url>
       <user-name>root</user-name>
-      <user-password>df9bdf98df99df9edf9f</user-password>
+      <user-password>dfcddfdfdfc5dfcddfdfdfc5df9bdf9edf9adf93</user-password>
       <libraries>
         <library>
           <url>file://$USER_HOME$/.PyCharm20/config/jdbc-drivers/mysql-connector-license.txt</url>

@@ -15,24 +15,6 @@ import os.path
 
 from os import environ
 
-debug = not environ.get("APP_NAME", "")
-if debug:
-
-    MYSQL_DB = 'questionbird' 
-    MYSQL_USER = 'root' 
-    MYSQL_PASS = '12345'
-    MYSQL_HOST_M = '127.0.0.1' 
-    MYSQL_HOST_S = '127.0.0.1' 
-    MYSQL_PORT = '3306' 
-else: 
-    import sae.const 
-    MYSQL_DB = sae.const.MYSQL_DB 
-    MYSQL_USER = sae.const.MYSQL_USER 
-    MYSQL_PASS = sae.const.MYSQL_PASS 
-    MYSQL_HOST_M = sae.const.MYSQL_HOST 
-    MYSQL_HOST_S = sae.const.MYSQL_HOST_S 
-    MYSQL_PORT = sae.const.MYSQL_PORT
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -44,7 +26,7 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-TEMPLATE_DIRS = ('./templates',)
+TEMPLATE_DIRS = ('F:/pythonproject/questionbird/templates',)
 
 ALLOWED_HOSTS = []
 
@@ -82,11 +64,11 @@ WSGI_APPLICATION = 'questionbird.wsgi.application'
 DATABASES = { 
     'default': { 
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': MYSQL_DB, 
-        'USER': MYSQL_USER, 
-        'PASSWORD': MYSQL_PASS, 
-        'HOST': MYSQL_HOST_M, 
-        'PORT': MYSQL_PORT, 
+        'NAME': 'questionbird', 
+        'USER': 'root', 
+        'PASSWORD': 'guoguo1409', 
+        'HOST': '127.0.0.1', 
+        'PORT': '3306', 
     } 
 }
 
@@ -107,5 +89,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = './static/'
-STATIC_PATH = './static'
+STATIC_URL = 'F:/pythonproject/questionbird/static/'
+STATIC_PATH = 'F:/pythonproject/questionbird/static'

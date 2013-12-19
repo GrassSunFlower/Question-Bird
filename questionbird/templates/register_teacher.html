@@ -1,0 +1,157 @@
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="/site_media/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/site_media/css/bootstrap-responsive2.0.min.css">
+  <link rel="stylesheet" href="/site_media/css/login_teacher.css">
+  <script type="text/javascript" src="/site_media/js/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/bootstrap2.0.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/jquery.form.js"></script>
+  <title>教师注册</title>
+</head>
+<body>
+<div class="header_full">
+  <div class="header">
+  <div class="twitter"><a href="index.html"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /></a><span>Follow us on Twitter</span></div>
+      <div class="clr"></div>
+      <div class="logo"><a href="index.html"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
+      <div class="clr"></div>
+    </div>
+  </div>
+  <div class="content" style="margin-left:15%;margin-top:15px;background-color:white;">
+    <div id="register">
+      <form class="form-horizontal" method="POST" action='/register_teacher/'>
+        <fieldset>
+          <div id="legend" class="">
+            <legend class="">注册</legend>
+          </div>
+          </fieldset>
+          <div class="control-group ">
+             <label class="control-label" for="name">用户名</label>
+             <div class="controls">
+              <input id="name" type="text" name="name" class="form-control" require>
+               <span class="help-inline hide">输入用户名</span>
+              </div>    
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="password">密码</label>
+            <div class="controls">
+              <input type="password" id="password" name="password" class="form-control">
+              <span class="help-inline hide">请输入密码</span>
+            </div>
+          </div>
+          <div class="control-group ">
+            <label class="control-label" for="confirm">确认密码</label>
+            <div class="controls">
+              <input type="password" id="confirm" class="form-control">
+              <span class="help-inline hide">两次输入不一致</span>
+            </div>
+          </div>
+          <div class="control-group ">
+              <label class="control-label" for="subjects">擅长学科</label>
+              <div class="controls">
+                <label class="checkbox inline"><input type="checkbox" name="subjects" value="chinese" />语文</label>
+                <label class="checkbox inline"><input type="checkbox" name="subjects"value="english"/>英语</label>
+                <label class="checkbox inline"><input type="checkbox" name="subjects" value="math"/>数学</label>
+                <span id="check" class="help-block">请至少选择一门<span>
+              </div>
+          </div>
+          <div class="control-group">
+             <label class="control-label" for="inviteNumber">邀请码</label>
+              <div class="controls">
+                <input id='inviteNumber' type='text' name="inviteNumber"  class="form-control">
+                 <span class="help-inline hide">
+                  邀请码错误
+                 </span>
+              </div>
+          </div>
+          <div id="errorMessage">
+          </div>
+           <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn">注册</button>
+            </div>
+          </div>
+      </form>
+    </div>
+  </div>
+    <div class="footer">
+    <div class="footer_resize">
+      <p class="rightt">© 闻题鸟</p>
+      <div class="clr"></div>
+    </div>
+  </div>
+</body>
+<script>
+$("input").blur(function(){
+  if($(this).val() == ''){
+    $(this).siblings('span').show();
+  }
+  else{
+    $(this).siblings('span').hide();
+  }
+})
+$("#confirm").blur(function(){
+  if($("#password").val()!=''){
+    if($("#password").val() != $("#confirm").val()){
+      $("#confirm").siblings('span').show();
+    }
+    else{
+      $("#confirm").siblings('span').hide();
+    }
+  }
+})
+$('input').focus(function(event) {
+  /* Act on the event */
+   $("#errorMessage").html("");
+});
+$('form').ajaxForm();
+$('form').on('submit',function(e){
+            e.preventDefault();
+            var num = 0;
+          if($('input[name="name"]').val()==''){
+            $('input[name="name"]').siblings('span').show();
+            $('#name').focus();
+            return;
+          }
+          if($('#password').val() == ''){
+            $('#password').siblings('span').show();
+            $('#password').focus();
+            return;
+          }
+          if($('#password').val() !=$('#confirm').val()){
+            $('#confirm').siblings('span').show();
+            $('#confirm').focus();
+            return;
+          }
+          $('input[name="subjects"]:checked').each(function(){
+               num++;
+           });
+          if(num == 0){
+            $('#check').show();
+            return;
+          }
+          if($('#inviteNumber').val()==''){
+            $('#inviteNumber').siblings('span').show();
+            $('#inviteNumber').focus();
+            return;
+          }
+         $(this).ajaxSubmit({
+             success:function(data){
+                if(data.state=='success'){
+                   window.location='/login_teacher/';
+                }
+                else if(data.state=='invite'){
+                  $("#errorMessage").html("invite error");
+                }
+                else if(data.state =='existed'){
+                  $('#errorMessage').html('name existed');
+                }
+             },
+             error:function(data){
+                alert('xcw432423');
+             }
+         })
+     })
+</script>
+</html>

@@ -3,34 +3,63 @@
   <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, height=device-height, user-scalable=no" charset="utf-8"/>
   <link rel="stylesheet" href="/site_media/css/bootstrap.min.css">
   <link rel="stylesheet" href="/site_media/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" href="/site_media/css/login.css">
+  <link rel="stylesheet" href="/site_media/css/login_teacher.css">
   <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
   <script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
   <title>闻题鸟教师端登录页面</title>
 </head>
 <body>
-  <div class="container">
-    <div id="login">
-      <img src="/site_media/img/login.jpg" height="100%" width="100%" style="z-index:-1"/>
-      <form class="form-signin" action="/login_teacher/" method="post">
-        {% if state == "nonexisted" %}
-          <div id='info'>登录失败，用户不存在!</div>
-        {% elif state == "null" %}
-          <div id='info'>账号和密码不能为空!</div>
-        {% elif state == "wrong" %}
-          <div id='info'>密码错误!</div>
-        {% else %}
-        {% endif %}
-        <div class="input-group">
-          <span class="input-group-addon">账号</span>
-          <input type="text" name="name" class="form-control">
-        </div>
-        <div class="input-group">
-          <span class="input-group-addon">密码</span>
-          <input type="password" name="password" class="form-control">
-        </div>
-        <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+<div class="header_full">
+  <div class="header">
+    <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /><span></span></div>
+      <div class="clr"></div>
+      <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
+      <div class="clr"></div>
+    </div>
+  </div>
+</div>
+  <div class="content">
+       <form class="form-horizontal" action="/login_teacher/" method="post">
+        <fieldset>
+          <div id="legend" class="">
+            <legend class="">登陆</legend>
+          </div>
+        <div class="control-group">
+              <!-- Text input-->
+              <label class="control-label" for="name" name="name">账号</label>
+              <div class="controls">
+                <input type="text" placeholder="account" class="input-xlarge" name="name">
+              </div>
+            </div>
+        <div class="control-group">
+              <!-- Text input-->
+              <label class="control-label" for="input01" name="password">密码</label>
+              <div class="controls">
+                <input type="password" placeholder="password" class="input-xlarge" name="password">
+                {% if state == "null" %}
+                  <p class="help-block">账号和密码不能为空！</p>
+                {% elif state == "nonexisted" %}
+                  <p class="help-block">用户不存在！</p>
+                {% elif state == "wrong" %}
+                  <p class="help-block">密码错误！</p>
+                {% else %}
+                {% endif %}
+              </div>
+            </div>
+        <div class="control-group">
+              <label class="control-label"></label>
+              <!-- Button -->
+              <div class="controls">
+                <button class="btn btn-inverse">登陆</button>
+              </div>
+            </div>
+        </fieldset>
       </form>
+  </div>
+  <div class="footer">
+    <div class="footer_resize">
+      <p class="rightt">© 闻题鸟</p>
+      <div class="clr"></div>
     </div>
   </div>
 </body>
