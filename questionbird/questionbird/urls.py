@@ -24,4 +24,6 @@ urlpatterns = patterns('',
     (r'^questions_teacher/$', questions_teacher),
     (r'^answerQuestion/$',answer),
     (r'^register_teacher/$',register_teacher),
+    (r'^checkQuestion/$',checkQuestion),
+    (r'^questions_unEvaluate/$', questions_unEvaluate),
 )
