@@ -31,12 +31,27 @@
     $("#solveQuestion").css('display','none');
     $("#solvePage").css('display','none');
 });
+  //播放Quicktime格式的视频，包括.mov .amr .3gp等    
+function pv_q(u, w, h){    
+  var pv='';    
+  pv += '<object width="'+w+'" height="'+h+'" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab">';    
+  pv += '<param name="src" value='+u+'>';    
+  pv += '<param name="controller" value="true">';    
+  pv += '<param name="type" value="video/quicktime">';    
+  pv += '<param name="autoplay" value="false">';    
+  pv += '<param name="target" value="myself">';    
+  pv += '<param name="bgcolor" value="black">';    
+  pv += '<param name="pluginspage" value="http://www.apple.com/quicktime/download/index.html">';    
+  pv += '<embed src='+u+' width="'+w+'" height="'+h+'" controller="true" align="middle" bgcolor="black" target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html"></embed>';    
+  pv += '</object>';    
+  document.write(pv);    
+}
 </script>
 <body>
 <div class="main">
 <div class="header_full">
   <div class="header">
-  <div class="twitter"><a href="index.html"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /></a><span>Follow us on Twitter</span></div>
+  <div class="twitter"><a href="index.html"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /></a><span>{{teachername}}</span></div>
       <div class="clr"></div>
       <div class="logo"><a href="index.html"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
       <div class="clr"></div>
@@ -56,13 +71,17 @@
               <div class="questionArea">
                 <div class="questionContent">
                   {%if question.ques_image %}
+
                   <img class="img-polaroid" style="width:100px;height:75px;float:right;" src={{question.ques_image}}/>
                   {%endif%}
                   {%if question.content%}
                   <p>{{question.content}}</p>
                   {%endif%}
                   {% if question.ques_voice %}
-                    <audio src={{question.ques_voice}} controls></audio>
+                    <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" src={{question.ques_voice}} controller="true" autoplay="false" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" >
+                      <embed src={{question.ques_voice}} width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false"target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html">
+                      </embed> 
+                    </object>
                   {% endif%}
                 </div>
                 <div class="answer">
@@ -101,8 +120,9 @@
                             </div>       
                       </form>
                       <div data='message'></div>
-                    </div>
-                    <button type="button" class="btn btn-link right" onclick='reply(this)'>回复</button>
+                    </div>  
+                    <button type="button" data="replybutton" class="btn btn-link right hide" onclick='reply(this)'>回复</button>
+                    <button type="button" class="btn btn-link right" onclick='choosetoanswer(this,{{question.id}})'>抢答</button>
                 </div>
               </div>
             </li>
@@ -120,7 +140,10 @@
                       <p>{{question.content}}</p>
                       {% endif %}
                       {% if question.ques_voice %}
-                      <audio src={{question.ques_voice}} controls></audio>
+                        <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" src={{question.ques_voice}} controller="true" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" >
+                          <embed src={{question.ques_voice}} width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false" target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html">
+                          </embed> 
+                        </object>
                       {% endif%}
                     </div>
                     <div class='answer'>
@@ -135,7 +158,7 @@
                         {%endif%}
                         {% if question.answer_voice %}
                         <p>语音回复：</p>
-                        <audio src={{question.answer_voice}} controls></audio>
+                        <audio src={{question.answer_voice}} control></audio>                       
                         {%endif%}
                     </div>
                   </div>
@@ -170,15 +193,53 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
   </div>
 </div>
+<div id="QuestionSuccess" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">抢答成功</h3>
+  </div>
+  <div class="modal-body">
+    <p>恭喜您抢答成功，请您在20分钟内完成解答，否则答题将会重新开放给其他老师。</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+  </div>
+</div>
+</div>
+<div id="QuestionFailure" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">抢答失败</h3>
+  </div>
+  <div class="modal-body">
+    <p>非常抱歉，此问题已经被抢答。</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+  </div>
+</div>
 </body>
 <script>
     function cancel(argument){
         $(argument).parent().parent().parent('div').hide();
-        $(argument).parent().parent().parent().siblings('button').show();
+      $(argument).parent().parent().parent().siblings("[data='replybutton']").show();
     }
     function reply(argument){
       $(argument).siblings('div').show();
       $(argument).hide();
+    }
+    function choosetoanswer(argument1,argument2){
+
+      $(argument1).siblings('div').show();
+      $(argument1).hide();
+      $.post('/checkQuestion/',{'questionid':argument2},function(data){
+          if(data.state == 'success'){
+            $("#QuestionSuccess").modal('toggle');
+          }
+          else if(data.state == 'failed'){
+            $("#QuestionFailure").modal('toggle');
+          }
+      })
     }
     function imageReply(argument){
       $(argument).parent().parent().siblings('form').children('.image').show();
@@ -196,7 +257,6 @@
       $(argument).parent().parent().siblings('form').children('.word').show();
     }
     var userforChange;
-    $('form').ajaxForm();
     var useforChange;
     $('form').on('submit',function(e){
         e.preventDefault();
@@ -317,6 +377,5 @@
       $('#unSolvePage').show();
       $('#solvePage').hide();
     }
-
 </script>
 </html>
