@@ -3,15 +3,15 @@
 from django.db import models
 
 
-# class User(models.Model):
-#     #MicroMessage name 微信名
-#     mmname = models.CharField(max_length=50)
-#     #QuestionBird name 闻题鸟用户名
-#     qbname = models.CharField(max_length=50)
-#     #闻题鸟密码
-#     password = models.CharField(max_length=30)
-#     #最后的操作
-#     last_oper = models.IntegerField()
+class User(models.Model):
+    #MicroMessage name 微信名
+    mmname = models.CharField(max_length=50)
+    #QuestionBird name 闻题鸟用户名
+    qbname = models.CharField(max_length=50)
+    #闻题鸟密码
+    password = models.CharField(max_length=30)
+    #最后的操作
+    last_oper = models.IntegerField()
 
 
 class Question(models.Model):
@@ -27,6 +27,8 @@ class Question(models.Model):
     category = models.CharField(max_length=30)
     #问题的状态：已解决或待解决
     question_state = models.CharField(max_length=10)
+    #问题正在改变
+    question_changing = models.IntegerField(max_length=10)
     #回答内容
     answer = models.CharField(max_length=100)
     #回答中的图片
@@ -44,8 +46,10 @@ class Question(models.Model):
 
 
 class QBUser(models.Model):
-    #QuestionBird name 闻题鸟用户名，即微信openID
-    mmname = models.CharField(max_length=50)
+    #QuestionBird name 闻题鸟用户名
+    qbname = models.CharField(max_length=50)
+    #闻题鸟密码
+    password = models.CharField(max_length=30)
     #剩余学习币
     learncoin = models.IntegerField()
     #已提问次数
@@ -54,8 +58,6 @@ class QBUser(models.Model):
     unsolved_num = models.IntegerField()
     #年级
     grade = models.CharField(max_length=30)
-    #最后的操作
-    last_oper = models.IntegerField()
 
 class Suggestion(models.Model):
     #建议内容
@@ -68,6 +70,17 @@ class Teacher(models.Model):
     password = models.CharField(max_length=30)
     #教师擅长学科
     subjects = models.CharField(max_length=100)
+    #教师学校
+    school = models.CharField(max_length=30)
+    #教师专业
+    major = models.CharField(max_length=30)
+    #教师邮箱
+    email = models.CharField(max_length=30)
+    #教师电话
+    mobilenumber = models.CharField(max_length=30)
+    #教师财富值
+    wealth = models.IntegerField()
+
 
 class RequestCode(models.Model):
     #邀请码
