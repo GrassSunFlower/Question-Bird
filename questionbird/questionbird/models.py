@@ -3,15 +3,15 @@
 from django.db import models
 
 
-class User(models.Model):
-    #MicroMessage name 微信名
-    mmname = models.CharField(max_length=50)
-    #QuestionBird name 闻题鸟用户名
-    qbname = models.CharField(max_length=50)
-    #闻题鸟密码
-    password = models.CharField(max_length=30)
-    #最后的操作
-    last_oper = models.IntegerField()
+# class User(models.Model):
+#     #MicroMessage name 微信名
+#     mmname = models.CharField(max_length=50)
+#     #QuestionBird name 闻题鸟用户名
+#     qbname = models.CharField(max_length=50)
+#     #闻题鸟密码
+#     password = models.CharField(max_length=30)
+#     #最后的操作
+#     last_oper = models.IntegerField()
 
 
 class Question(models.Model):
@@ -44,10 +44,8 @@ class Question(models.Model):
 
 
 class QBUser(models.Model):
-    #QuestionBird name 闻题鸟用户名
-    qbname = models.CharField(max_length=50)
-    #闻题鸟密码
-    password = models.CharField(max_length=30)
+    #QuestionBird name 闻题鸟用户名，即微信openID
+    mmname = models.CharField(max_length=50)
     #剩余学习币
     learncoin = models.IntegerField()
     #已提问次数
@@ -56,6 +54,8 @@ class QBUser(models.Model):
     unsolved_num = models.IntegerField()
     #年级
     grade = models.CharField(max_length=30)
+    #最后的操作
+    last_oper = models.IntegerField()
 
 class Suggestion(models.Model):
     #建议内容
