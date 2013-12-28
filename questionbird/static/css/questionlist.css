@@ -1,9 +1,38 @@
 body {
-	font-size: 40px;
+	font-size: 20px;
 }
 h3 {
-	font-size: 60px;
+	font-size: 35px;
+}
+.badge{
+	padding: 7px;
+}
+.panel {
+	border:5px #F0F0F0;
+	border-style: solid;
+	border-radius: 5px;
 }
 .panel-title {
-	font-size: 40px;
+	font-family: "黑体";
+	border-radius: 5px;
+	font-size: 25px;
+	padding: 5px;
+}
+.panel-body {
+	border-radius: 5px;
+	font-family: "黑体";
+	margin-top: 10px;
+}
+.panel-footer {
+	font-family: "黑体";
+	border-radius: 5px;
+	margin-top: 5px;
+	padding-top: 5px;
+	padding-bottom: 10px;
+	background-color: #F0F0F0;
+}
+#header {
+	border-radius: 5px;
+	padding: 10px;
+	background-color: #46A3FF;
 }

@@ -1,20 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="2907920181">
-    <data-source source="LOCAL" name="Django default" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="9f75ef3c-2d41-4edb-90b9-655d7bb69b79">
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://127.0.0.1:3306/questionbird</jdbc-url>
-      <user-name>root</user-name>
-      <user-password>dfcddfdfdfc5dfcddfdfdfc5df9bdf9edf9adf93</user-password>
-      <libraries>
-        <library>
-          <url>file://$USER_HOME$/.PyCharm20/config/jdbc-drivers/mysql-connector-license.txt</url>
-        </library>
-        <library>
-          <url>file://$USER_HOME$/.PyCharm20/config/jdbc-drivers/mysql-connector-java-5.1.26-bin.jar</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
-</project>
+<project version="4" />
 

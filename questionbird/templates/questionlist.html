@@ -1,0 +1,26 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"> 
+<link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
+<script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="list-group">
+        <a href="#" class="list-group-item ">       
+		      <h4 class="media-heading">您的问题列表</h4>
+        </a>
+        {% for question in questionlist %}
+	        <a href="/single_question/?id={{ question.id }}" class="list-group-item ">
+	        	{% if question.ques_image %}     
+	      			<img class="media-object pull-right" data-src="holder.js/64x64" alt="64x64" style="width: 64px; height: 64px;" src={{ question.ques_image }}>
+	      		{% endif %}
+			    <div class="media-body" style="margin-right:10px">
+			      <h4 class="media-heading">{{ question.category }}</h4>
+			     	{{ question.content }}
+		    	</div>
+	        </a>
+	    {% endfor %}
+    <div>
+</body>
+</html>

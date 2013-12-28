@@ -2,7 +2,7 @@
 # coding=utf-8
 
 #运行的服务器网址
-SERVER_URL= "http://59.66.149.157/"
+SERVER_URL= "http://59.66.149.157"
 #token值
 QB_TOKEN = "questionbird"
 #AppId值 在微信公共平台管理页获得
@@ -19,30 +19,31 @@ UPLOAD_URL = 'http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=%s
 DOWNLOAD_URL = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s'
 #主动发送消息post的url
 POST_URL = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s'
+#获取用户名的get的url
+GET_NAME_URL = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s'
 
-
-#登陆、注册、登出操作的eventkey值
-E_KEY_LOGIN = "Q_login_regis_logout"
-#提出问题的eventkey值
+# 提出问题的eventkey值
 E_KEY_ASK = "Q_ask_ques"
-#查看已解决的问题的eventkey值
+# 查看已解决的问题的eventkey值
 E_KEY_SOLVED = "Q_solved_ques"
-#查看待解决的问题的eventkey值
+# 查看待解决的问题的eventkey值
 E_KEY_UNSOLVED = "Q_unsolved_ques"
-#查看资料的eventkey值
+# 扔一个
+E_KEY_THROW = "Q_raise_ques"
+# 捡一个
+E_KEY_PICK = "Q_pick_ques"
+# 查看资料的eventkey值
 E_KEY_INFO = "Q_information"
-#更改昵称的eventkey值
-E_KEY_NICKNAME = "Q_chg_name"
-#更改密码的eventkey值
-E_KEY_PASS = "Q_chg_pass"
-#更改年级的eventkey值
+# 更改年级的eventkey值
 E_KEY_GRADE = "Q_chg_grade"
-#产品信息的eventkey值
+# 产品信息的eventkey值
 E_KEY_PRODUCT = "Q_product_info"
-#反馈意见的eventkey值
+# 反馈意见的eventkey值
 E_KEY_FEEDBACK = "Q_feedback"
-#查看活动的eventkey值
+# 查看活动的eventkey值
 E_KEY_ACTIVITY = "Q_activity"
+# 下载App的eventkey值
+E_KEY_DOWNLOAD = "Q_download"
 
 CATEGORY_DIC = {
 	'1' : '小学语文',
@@ -68,4 +69,9 @@ CATEGORY_GRADE_DIC = {
 	'10': '高中一年级',
 	'11': '高中二年级',
 	'12': '高中三年级',
+}
+
+ANSWER_SCORE = {
+	'0' : 0,
+	'1' : 1,
 }

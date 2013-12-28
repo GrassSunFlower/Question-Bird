@@ -14,6 +14,9 @@
     <orderEntry type="jdk" jdkName="Python 2.7.3 (F:/Python27/python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="myDocStringFormat" value="Plain" />
+  </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
@@ -21,6 +24,10 @@
         <option value="D:\homework and so on\软工3\大作业2\新建文件夹\questionbird\templates" />
       </list>
     </option>
+  </component>
+  <component name="TestRunnerService">
+    <option name="projectConfiguration" value="Unittests" />
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
   </component>
 </module>
 

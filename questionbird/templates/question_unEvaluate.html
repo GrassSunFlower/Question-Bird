@@ -1,0 +1,322 @@
+<html>
+<head>
+<title>闻题鸟未满意问题</title>
+<meta charset='utf-8' />
+<link href="/site_media/css/bootstrap2.0.min.css" rel="stylesheet" type="text/css" />
+<link href='/site_media/css/style.css' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src='/site_media/js/jquery-1.8.2.min.js'></script>
+<script type="text/javascript" src="/site_media/js/jPages.js"></script>
+<script type="text/javascript" src="/site_media/js/bootstrap2.0.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery.form.js"></script>
+<script type="text/javascript" src='/site_media/js/recorder.js'></script>
+<script type="text/javascript" src='/site_media/js/recorderWorker.js'></script>
+<script>
+  $(function(){
+    $("div .holder").jPages({
+        containerID : "unsolveQuestion",
+        first: '首页',
+        last: '尾页',
+        previous: '上页',
+        next: '下页',
+        perPage: 5,
+    });
+});
+</script>
+<body>
+<div class="main">
+<div class="header_full">
+  <div class="header">
+  <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" />
+   
+      <div class="btn-group pull-right">
+        <a class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">{{teachername}}<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/profile_teacher/">个人资料</a></li>
+          <li><a href='/questions_solved/'>已解决问题</a></li>
+          <li><a href='/questions_teacher/'>待解决问题</a></li>
+          <li class="divider"></li>
+          <li><a href="/logout_teacher/">登出</a></li>
+        </ul>
+      </div>
+    </div>
+      <div class="clr"></div>
+      <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></div>
+      <div class="clr"></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="block_box">
+      <div class="block_box_t">
+        <div class="block_box_b">
+      
+          <h1 class="latest">未满意问题</h1>
+          <ol id="unsolveQuestion">
+            {% for question in unEvaluate %}
+            <li>
+              <div class="questionArea">
+                <div class="questionContent">
+                  {%if question.ques_image %}
+
+                  <img class="img-polaroid" onclick="openBig(this)" src={{question.ques_image}}/>
+                  {%endif%}
+                  {%if question.content%}
+                  <p>{{question.content}}</p>
+                  {%endif%}
+                  {% if question.ques_voice %}
+                    <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" src={{question.ques_voice}} controller="true" autoplay="false" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" >
+                      <embed src={{question.ques_voice}} width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false"target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html">
+                      </embed> 
+                    </object>
+                  {% endif%}
+                </div>
+                <div class='answer'>
+                        {% if  question.answer%}
+                        <p>文字回复：</p>
+                        <p>{{question.answer}}</p>
+                        {%endif%}
+                        {% if  question.answer_image %}
+                        <p>图片回复：</p>
+                        <img src={{question.answer_image}}>
+                        {%endif%}
+                        {% if question.answer_voice %}
+                        <p>语音回复：</p>
+                        <audio src={{question.answer_voice}} controls></audio>
+                       {%endif%}
+                       {%if question.answer_eva%}
+                       <p>评价</p>
+                       <p>{{question.answer_eva}}</p>
+                       {%endif%}
+                </div>
+                <div class="answer">
+                    <div  style="display:none" data='reply'>
+                      <ul class="breadcrumb" style="width:62%;background-color:rgba(87, 56, 214, 0.26);">
+                        <li><a  onclick="wordReply(this)">文字回复</a><span class='divider'>/<span></li>
+                        <li><a  onclick='voiceReply(this)'>语音回复</a><span class='divider'>/</span></li>
+                        <li><a  onclick='imageReply(this)'>插入图片</a><span class='divider'>/</span>
+                        </li>
+                      </ul> 
+                       <form enctype="multipart/form-data" method="POST" action="/replayQuestion/">
+                            <input style='display:none' name='solver' value={{teachername}}>
+                            <input style='display:none' name='id' value={{question.id}}>                           
+                            <div class="word">
+                              <textarea id="textarea" style="width:65%;height:100px;border: 1px solid #ddd;" name='answerword' required></textarea>
+                            </div>
+                            <div class="voice" style="display:none" style="margin-left:15%;">
+                                <audio controls></audio>
+                                <div class='button group' style='margin-top:10px'>
+                                  <button type='button' class="btn" onclick="startRecording(this)"> 开始</button>
+                                  <button type='button' class="btn" onclick="stopRecording(this)">停止</button>
+                                </div>
+                                 <a href="#" class="btn">下载</a>
+                                <p style="margin-left:-10%">下一步</p>
+                                  <input style='margin-top:15px' class="input-file" id="fileInput" type="file" name="voice" value="上传" onchange="decideSuffixVoice(this)">
+                            </div>
+                            <div class='image' style='display:none'>
+                              <div style="margin-top:15px;">
+                                <input value="插入图片" type='file' name='image' onchange="decideSuffixImage(this)">
+                                <img src='' id='imagePic'>
+                              </div>
+                            </div>
+                            <div class="right">
+                                <button class="btn btn-link" type="submit" >提交</button>
+                                <button class="btn btn-link" onclick='cancel(this)'>取消</button>
+                            </div>       
+                      </form>
+                      <div data='message'></div>
+                    </div>
+                    <button type="button" class="btn btn-link right" onclick='reply(this)'>回复</button>
+                </div>
+              </div>
+            </li>
+            {% endfor%}
+          </ol>
+            <!-- navigation panel -->
+          <div class="holder" id='solvePage'></div>
+          <div class="clr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="footer_resize">
+      <p class="rightt">© 闻题鸟</p>
+      <div class="clr"></div>
+    </div>
+  </div>
+  <div class="clr"></div>
+</div>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">成功</h3>
+  </div>
+  <div class="modal-body">
+    <p>你的问题已经提交成功</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" onclick ='reload()' aria-hidden="true">关闭</button>
+  </div>
+</div>
+<div id="imageDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">题目图片</h3>
+  </div>
+  <div class="modal-body">
+    <img src="">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='Failureclose' data-dismiss="modal" aria-hidden="true">关闭</button>
+  </div>
+</div>
+</body>
+<script>
+function openBig(argument){
+  var src = $(argument).attr('src');
+  $("#imageDialog").children('.modal-body').children('img').attr('src',src);
+  $("#imageDialog").modal('toggle');
+}
+$('#myModal').on('hidden', function () {
+  // do something…
+   window.location.reload();
+})
+      function cancel(argument){
+        $(argument).parent().parent().parent('div').hide();
+      $(argument).parent().parent().parent().siblings("[data='replybutton']").show();
+    }
+    function reply(argument){
+      $(argument).siblings('div').show();
+      $(argument).hide();
+    }
+    function imageReply(argument){
+      $(argument).parent().parent().siblings('form').children('.image').show();
+      $(argument).parent().parent().siblings('form').children('.voice').hide();
+      $(argument).parent().parent().siblings('form').children('.word').hide();
+    }
+    function voiceReply(argument){
+      $(argument).parent().parent().siblings('form').children('.image').hide();
+      $(argument).parent().parent().siblings('form').children('.voice').show();
+      $(argument).parent().parent().siblings('form').children('.word').hide();
+    }
+    function wordReply(argument){
+      $(argument).parent().parent().siblings('form').children('.image').hide();
+      $(argument).parent().parent().siblings('form').children('.voice').hide();
+      $(argument).parent().parent().siblings('form').children('.word').show();
+    }
+    var thisscope;
+    $('form').on('submit',function(e){
+        e.preventDefault();
+        var word=$(this).children(".word").children('textarea').val();
+        var voice=$(this).children(".voice").children('[name="voice"]').val();
+        var image=$(this).children(".image").children().children('[name="image"]').val();
+        if(word==''&&voice==''&&image==''){
+          alert('至少输入一项');
+            return;
+        }
+        if(voice!=''){
+         if(voice.match(/.wav|.mp3$/) == null){
+          alert('音频格式文件不对');
+          return ;
+         }
+        }
+        if(image!=''){
+          if(image.match(/.jpg|.png|.jpeg|.gif|.bmp$/) == null){
+            alert('图片格式不对！');
+            return;
+          }
+        }
+        window.thisscope= this;
+       $(this).ajaxSubmit({
+           type:"post",
+           success:function(data){
+              if(data.state=='success'){
+                $("#myModal").modal('toggle');
+              }
+           },
+           error:function(data){
+              alert("载入失败");
+           }
+       })
+     })
+    var onFail = function(e){
+      alert("please use chrome for recording!");
+      console.log('Rejected!',e);
+    };
+    var onSuccess = function(s){
+        var context = new webkitAudioContext();
+        var mediaStreamSource = context.createMediaStreamSource(s);
+        recorder = new Recorder(mediaStreamSource);
+        recorder.record();
+    };
+    window.URL = window.URL || window.webkitURL;
+    navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    var recorder;
+    var audio;
+    function startRecording(argument) {
+        window.audio = $(argument).parent().siblings('audio');
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({audio: true}, onSuccess, onFail);
+        } else {
+            console.log('navigator.getUserMedia not present');
+        }
+    };
+    function stopRecording(argument) {
+        event.preventDefault();
+        recorder.stop();
+        window.audio = $(argument).parent().siblings('audio');
+        recorder.exportWAV(function(s) {
+            var url = window.URL.createObjectURL(s);
+            console.log(s);
+            window.audio.attr('src',url);
+            window.audio.siblings('a').attr('href',url);
+            window.audio.siblings('a').attr('download','ouput.wav');
+        });
+    };  
+    var onFail = function(e){
+      alert("please use chrome for recording!");
+      console.log('Rejected!',e);
+    };
+    var onSuccess = function(s){
+        var context = new webkitAudioContext();
+        var mediaStreamSource = context.createMediaStreamSource(s);
+        recorder = new Recorder(mediaStreamSource);
+        recorder.record();
+    };
+    window.URL = window.URL || window.webkitURL;
+    navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    var recorder;
+    var audio;
+    function startRecording(argument) {
+        window.audio = $(argument).parent().siblings('audio');
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({audio: true}, onSuccess, onFail);
+        } else {
+            console.log('navigator.getUserMedia not present');
+        }
+    };
+    function stopRecording(argument) {
+        event.preventDefault();
+        recorder.stop();
+        window.audio = $(argument).parent().siblings('audio');
+        recorder.exportWAV(function(s) {
+            var url = window.URL.createObjectURL(s);
+            console.log(s);
+            window.audio.attr('src',url);
+            window.audio.siblings('a').attr('href',url);
+            window.audio.siblings('a').attr('download','ouput.wav');
+        });
+    }; 
+      function decideSuffixImage(argument){
+      // if($(argument).val().find('.'))
+      if($(argument).val().match(/.jpg|.png|.jpeg|.gif|.bmp$/)==null){
+        alert("请使用.jpg或.png或.jpeg或.gif或.bmp格式");
+        $(argument).val('');
+      }
+    }
+    function decideSuffixVoice(argument){
+      if($(argument).val().match(/.wav|.mp3$/)==null){
+        alert("请使用.wav或者.mp3格式");
+        $(argument).val("");
+      }
+    }
+</script>
+</html>

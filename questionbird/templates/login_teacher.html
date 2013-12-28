@@ -1,60 +1,58 @@
 <html>
 <head>
-  <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, height=device-height, user-scalable=no" charset="utf-8"/>
-  <link rel="stylesheet" href="/site_media/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/site_media/css/bootstrap-theme.min.css">
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="/site_media/css/bootstrap2.0.min.css">
+  <link rel="stylesheet" href="/site_media/css/bootstrap-responsive2.0.min.css">
   <link rel="stylesheet" href="/site_media/css/login_teacher.css">
-  <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
-  <script type="text/javascript" src="/site_media/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/bootstrap2.0.min.js"></script>
+  <script type="text/javascript" src="/site_media/js/jquery.form.js"></script>
   <title>闻题鸟教师端登录页面</title>
 </head>
 <body>
-<div class="header_full">
-  <div class="header">
-    <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /><span></span></div>
+  <div class="header_full">
+    <div class="header">
+      <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /><span></span></div>
       <div class="clr"></div>
-      <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
+      <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></div>
       <div class="clr"></div>
     </div>
   </div>
-</div>
   <div class="content">
-       <form class="form-horizontal" action="/login_teacher/" method="post">
-        <fieldset>
-          <div id="legend" class="">
-            <legend class="">登陆</legend>
+    <form class="form-horizontal" action="/login_teacher/" method="post">
+      <fieldset>
+        <div id="legend" class="">
+          <legend class="">登陆</legend>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="name" name="name">用户名</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" name="name">
           </div>
+        </div>
         <div class="control-group">
-              <!-- Text input-->
-              <label class="control-label" for="name" name="name">账号</label>
-              <div class="controls">
-                <input type="text" placeholder="account" class="input-xlarge" name="name">
-              </div>
-            </div>
+          <label class="control-label" for="input01" name="password">密码</label>
+          <div class="controls">
+            <input type="password" class="input-xlarge" name="password">
+            {% if state == "null" %}
+              <p class="help-block">账号和密码不能为空！</p>
+            {% elif state == "nonexisted" %}
+              <p class="help-block">用户不存在！</p>
+            {% elif state == "wrong" %}
+              <p class="help-block">密码错误！</p>
+            {% else %}
+            {% endif %}
+          </div>
+        </div>
         <div class="control-group">
-              <!-- Text input-->
-              <label class="control-label" for="input01" name="password">密码</label>
-              <div class="controls">
-                <input type="password" placeholder="password" class="input-xlarge" name="password">
-                {% if state == "null" %}
-                  <p class="help-block">账号和密码不能为空！</p>
-                {% elif state == "nonexisted" %}
-                  <p class="help-block">用户不存在！</p>
-                {% elif state == "wrong" %}
-                  <p class="help-block">密码错误！</p>
-                {% else %}
-                {% endif %}
-              </div>
-            </div>
-        <div class="control-group">
-              <label class="control-label"></label>
-              <!-- Button -->
-              <div class="controls">
-                <button class="btn btn-inverse">登陆</button>
-              </div>
-            </div>
-        </fieldset>
-      </form>
+          <label class="control-label"></label>
+          <div class="controls">
+            <a href="/register_teacher/" class="btn btn-inverse" style="margin-right:130px">返回注册</a>
+            <button class="btn btn-primary">登陆</button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
   </div>
   <div class="footer">
     <div class="footer_resize">

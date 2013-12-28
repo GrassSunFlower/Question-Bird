@@ -1,40 +1,39 @@
- <html>
- <head>
-  <title>answer</title>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>回答</title>
   <meta name="viewport" charset="utf-8"/>
   <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="../static/css/bootstrap-theme.min.css">
   <script type="text/javascript" src="../static/js/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
 </head>
 <body>
-
- <!-- Snippet Code -->
- <div class="panel-group" id="accordion">
+  <div class="panel-group" id="accordion">
   {% if questions %}
     {% for question in questions %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <div class="row">
-          <a onclick="collapseToggle(this)" class="col-md-10" style="cursor:pointer">{{question}}</a>
-         <span class="badge pull-right">42</span>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <div class="row">
+              <a onclick="collapseToggle(this)" class="col-md-10" style="cursor:pointer">{{question}}</a>
+             <span class="badge pull-right">42</span>
+            </div>
+          </h4>
         </div>
-      </h4>
-    </div>
-    <div  class="panel">
-      <div class="panel-body">
-        <pre>{{answer}}</pre>
-        <textarea class="form-control" rows="3"></textarea>
-        <button class='btn btn-lg btn-primary pull-right'>提交</button>
-    </div>
-  </div>
-  </div>
+        <div  class="panel">
+          <div class="panel-body">
+            <pre>{{answer}}</pre>
+            <textarea class="form-control" rows="3"></textarea>
+            <button class='btn btn-lg btn-primary pull-right'>提交</button>
+          </div>
+        </div>
+      </div>
     {%endfor%}
   {%else%}
   <div>no qusetion</div>
   {%endif%}
-</div>
+  </div>
 </body>
 <script>
    function collapseToggle(argument){
@@ -42,4 +41,3 @@
    }
 </script>
 </html>
-      <!-- Snippet Code end -->

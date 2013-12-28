@@ -1,0 +1,43 @@
+body{
+	margin:0;
+	padding-left: 5%;
+	width: 90%;
+	font-family: 黑体;
+}
+
+h2{
+	text-align: center;
+	font-size:70px;
+	margin-top: 1%;
+	margin-bottom: 1%;
+}
+
+img{
+	width: 100%;
+}
+
+.container{
+	margin-top: 1%;
+	margin-bottom: 1%;
+}
+
+.content{
+	margin-top: 1%;
+}
+
+.answer{
+	font-size: 50px;
+	padding-top: 5%;
+}
+
+.text{
+	font-size: 40px;
+	padding-top: 5%;
+}
+
+.message{
+	font-size: 50px;
+	text-align: right;
+	margin-top: 1%;
+	margin:1%;
+}

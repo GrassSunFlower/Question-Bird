@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>问题详情</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link href="/site_media/css/que.css" rel="stylesheet" type="text/css" />
+
+<style>
+#play{
+  border-top: 100px solid transparent;
+  border-bottom: 100px solid transparent;
+  border-left: 174px solid black;
+  border-right: 0px;
+}
+</style>
+
+<body>
+  <div class="container">
+    <div class="title"><h2>问题详情</h2></div>
+    <hr/>
+    <div class="content">
+      <div class="message">{{question.category}}</div>
+      {% if question.ques_image %}
+        <img src={{ question.ques_image }}>
+      {% endif %}
+      <div class="text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{question.content}}</div>
+      <hr/>
+      {% if question.question_state == "已解决" %}
+        <div class="answer">
+          <h2>解&nbsp;&nbsp;&nbsp;&nbsp;答</h2>
+          <hr/>
+          {% if question.answer %}
+            <div class="text"><p>文字：</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{question.answer}}</div>
+          {% endif %}
+          {% if question.answer_image %}
+          <p>图片：</p>
+            <img src={{ question.answer_image }}>
+          {% endif %}
+          {% if question.answer_voice %}
+          <p>语音：</p>
+            <audio id="audio" src={{question.answer_voice}}></audio>
+              <div style="position:absolute; height:340px;width:340px; background-color:rgba(173, 216, 230, 1);border-radius:170px">
+                <div id="play" style="cursor:pointer;margin-left:120px;margin-top:70px" onclick="play()" >
+                </div>
+              <div id="stop" onclick="stop()" style="cursor:pointer;display:none;margin:60px auto;width:90px;margin-top:70">
+                <div style="width:40px;height:200px;background-color:black;margin-right:10px;float:left"></div>
+                <div style="width:40px;height:200px;background-color:black; top:-200px;float:left"></div>
+                <div style="clear:both"></div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+      <hr/>
+    </div>
+  </div>
+</body>
+<script>
+var audio = document.getElementById('audio');
+function play(){
+  document.getElementById('play').style.display ="none";
+  document.getElementById('stop').style.display = "block";
+  audio.play();
+}
+function stop(){
+  document.getElementById('play').style.display ="block";
+  document.getElementById('stop').style.display = "none";
+  audio.pause();
+}
+</script>
+</html>

@@ -38,13 +38,7 @@ function exportWAV(type){
   var bufferR = mergeBuffers(recBuffersR, recLength);
   var interleaved = interleave(bufferL, bufferR);
   var dataview = encodeWAV(interleaved);
-  // jQuery.post('/register/',{dataview:dataview},function(){});
-  console.log(interleaved);
-  console.log(dataview);
-  debugger;
   var audioBlob = new Blob([dataview], { type: type });
-  console.log(audioBlob);
-
   this.postMessage(audioBlob);
 }
 

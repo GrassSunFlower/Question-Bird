@@ -280,6 +280,13 @@ div.but {
     padding-right: 10px;
 }
 
+.questionContent img{
+    width:100px;
+    height:50px;
+    float:right;
+    cursor:pointer;
+}
+
 #reply, #confirm{
     padding-bottom: 5px;
     color: black;

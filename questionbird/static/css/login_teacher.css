@@ -74,3 +74,8 @@
     padding:25px 0;
     float:right;
 }
+
+#errorMessage{
+    margin-left: 10%;
+    width: 20%;
+}

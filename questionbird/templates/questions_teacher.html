@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Teacher Admin</title>
+<title>闻题鸟最新问题</title>
 <meta charset='utf-8' />
 <link href="/site_media/css/bootstrap2.0.min.css" rel="stylesheet" type="text/css" />
 <link href='/site_media/css/style.css' rel='stylesheet' type='text/css'/>
@@ -12,58 +12,43 @@
 <script type="text/javascript" src='/site_media/js/recorderWorker.js'></script>
 <script>
   $(function(){
-    $("#solvePage").jPages({
-        containerID : "solveQuestion",
-        first: '首页',
-        last: '尾页',
-        previous: '上页',
-        next: '下页',
-        perPage: 2,
-    });
     $("#unSolvePage").jPages({
        containerID : "unsolveQuestion",
         first: '首页',
         last: '尾页',
         previous: '上页',
         next: '下页',
-        perPage: 2,
+        perPage: 5,
     })
-    $("#solveQuestion").css('display','none');
-    $("#solvePage").css('display','none');
 });
-  //播放Quicktime格式的视频，包括.mov .amr .3gp等    
-function pv_q(u, w, h){    
-  var pv='';    
-  pv += '<object width="'+w+'" height="'+h+'" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab">';    
-  pv += '<param name="src" value='+u+'>';    
-  pv += '<param name="controller" value="true">';    
-  pv += '<param name="type" value="video/quicktime">';    
-  pv += '<param name="autoplay" value="false">';    
-  pv += '<param name="target" value="myself">';    
-  pv += '<param name="bgcolor" value="black">';    
-  pv += '<param name="pluginspage" value="http://www.apple.com/quicktime/download/index.html">';    
-  pv += '<embed src='+u+' width="'+w+'" height="'+h+'" controller="true" align="middle" bgcolor="black" target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html"></embed>';    
-  pv += '</object>';    
-  document.write(pv);    
-}
 </script>
 <body>
 <div class="main">
 <div class="header_full">
   <div class="header">
-  <div class="twitter"><a href="index.html"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" /></a><span>{{teachername}}</span></div>
+  <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" />
+   
+      <div class="btn-group pull-right">
+        <a class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">{{teachername}}<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/profile_teacher/">个人资料</a></li>
+          <li><a href='/questions_solved/'> 已解决问题</a></li>
+          <li><a href='/questions_unEvaluate/'> 未满意问题</a></li>
+          <li class="divider"></li>
+          <li><a href="/logout_teacher/">登出</a></li>
+        </ul>
+      </div>
+    </div>
       <div class="clr"></div>
-      <div class="logo"><a href="index.html"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></a></div>
+      <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></div>
       <div class="clr"></div>
     </div>
   </div>
-
   <div class="body">
     <div class="block_box">
       <div class="block_box_t">
         <div class="block_box_b">
-          <div class="but" style='cursor:pointer' id= "lookSolve" onclick="lookSolve()" >查看已解决问题</div>
-          <div class="but hide" style="cursor:pointer" id='lookUnSolve' onclick="lookUnSolve()">查看待解决问题</div>
+          <div class="but hide" style="cursor:pointer">查看待解决问题</div>
           <h1 class="latest">最新问题</h1>
           <ol id="unsolveQuestion">
             {% for question in unsolve %}
@@ -72,14 +57,14 @@ function pv_q(u, w, h){
                 <div class="questionContent">
                   {%if question.ques_image %}
 
-                  <img class="img-polaroid" style="width:100px;height:75px;float:right;" src={{question.ques_image}}/>
+                  <img class="img-polaroid" onclick='openBig(this)' src={{question.ques_image}} />
                   {%endif%}
                   {%if question.content%}
                   <p>{{question.content}}</p>
                   {%endif%}
                   {% if question.ques_voice %}
-                    <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" src={{question.ques_voice}} controller="true" autoplay="false" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" >
-                      <embed src={{question.ques_voice}} width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false"target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html">
+                    <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" controller="true" autoplay="false" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" src={{question.ques_voice}}>
+                      <embed width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false"target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html" src={{question.ques_voice}}>
                       </embed> 
                     </object>
                   {% endif%}
@@ -106,11 +91,11 @@ function pv_q(u, w, h){
                                 </div>
                                  <a href="#" class="btn">下载</a>
                                 <p style="margin-left:-10%">下一步</p>
-                                  <input style='margin-top:15px' class="input-file" id="fileInput" type="file" name="voice" value="上传">
+                                  <input style='margin-top:15px' class="input-file" id="fileInput" type="file" name="voice" value="上传" onchange="decideSuffixVoice(this)">
                             </div>
                             <div class='image' style='display:none'>
                               <div style="margin-top:15px;">
-                                <input value="插入图片" type='file' name='image'>
+                                <input value="插入图片" type='file' name='image' onchange="decideSuffixImage(this)">
                                 <img src='' id='imagePic'>
                               </div>
                             </div>
@@ -122,51 +107,18 @@ function pv_q(u, w, h){
                       <div data='message'></div>
                     </div>  
                     <button type="button" data="replybutton" class="btn btn-link right hide" onclick='reply(this)'>回复</button>
+                    {%if question.start_time == '0'%}
                     <button type="button" class="btn btn-link right" onclick='choosetoanswer(this,{{question.id}})'>抢答</button>
+                    {%else%}
+                    <button type="button" class="btn btn-link right" onclick='againChoosetoanswer(this)'>回复</button>
+                    {%endif%}
+
                 </div>
               </div>
             </li>
             {% endfor%}
           </ol>
-          <ol id='solveQuestion'>
-              {% for question in solve %}
-                <li>
-                  <div class="questionArea">
-                    <div class="questionContent">
-                      {% if question.ques_image %}
-                      <img class="img-polaroid" style="width:100px;height:75px;float:right;" src={{question.ques_image}}/>
-                      {% endif %}
-                      {% if question.content%}
-                      <p>{{question.content}}</p>
-                      {% endif %}
-                      {% if question.ques_voice %}
-                        <object width="200" height="30" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" src={{question.ques_voice}} controller="true" type="video/quicktime" autoplay="false" target="myself" bgcolor="black" pluginspage="http://www.apple.com/quicktime/download/index.html" >
-                          <embed src={{question.ques_voice}} width="200" height="30" controller="true" align="middle" bgcolor="black" autoplay="false" target="myself" type="video/quicktime" pluginspage="http://www.apple.com/quicktime/download/index.html">
-                          </embed> 
-                        </object>
-                      {% endif%}
-                    </div>
-                    <div class='answer'>
-                        
-                        {% if  question.answer%}
-                        <p>文字回复：</p>
-                        <p>{{question.answer}}</p>
-                        {%endif%}
-                        {% if  question.answer_image %}
-                        <p>图片回复：</p>
-                        <img src={{question.answer_image}}>
-                        {%endif%}
-                        {% if question.answer_voice %}
-                        <p>语音回复：</p>
-                        <audio src={{question.answer_voice}} control></audio>                       
-                        {%endif%}
-                    </div>
-                  </div>
-                </li>
-                {% endfor%}
-          </ol>
             <!-- navigation panel -->
-          <div class="holder" id='solvePage'></div>
           <div class='holder' id='unSolvePage'></div>
           <div class="clr"></div>
         </div>
@@ -183,19 +135,17 @@ function pv_q(u, w, h){
 </div>
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">再次确认</h3>
+    <h3 id="myModalLabel">成功</h3>
   </div>
   <div class="modal-body">
-    <p>你的问题已经提交成功，请在已解决问题里查看评价 </p>
+    <p>你的问题已经提交成功</p>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+    <button id="btn" class="btn" data-dismiss="modal"  aria-hidden="true">关闭</button>
   </div>
 </div>
 <div id="QuestionSuccess" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">抢答成功</h3>
   </div>
   <div class="modal-body">
@@ -208,21 +158,56 @@ function pv_q(u, w, h){
 </div>
 <div id="QuestionFailure" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="myModalLabel">抢答失败</h3>
   </div>
   <div class="modal-body">
-    <p>非常抱歉，此问题已经被抢答。</p>
+    <p>非常抱歉，此问题已经被抢答或者超时。</p>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+    <button class="btn" id='Failureclose' data-dismiss="modal" aria-hidden="true">关闭</button>
+  </div>
+</div>
+<div id="oneMore" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">回答失败</h3>
+  </div>
+  <div class="modal-body">
+    <p>你的回答失败</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='Failureclose' data-dismiss="modal" aria-hidden="true">关闭</button>
+  </div>
+</div>
+<div id="imageDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">题目图片</h3>
+  </div>
+  <div class="modal-body">
+    <img src="">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='Failureclose' data-dismiss="modal" aria-hidden="true">关闭</button>
   </div>
 </div>
 </body>
 <script>
+function openBig(argument){
+  var src = $(argument).attr('src');
+  $("#imageDialog").children('.modal-body').children('img').attr('src',src);
+  $("#imageDialog").modal('toggle');
+}
+$('#QuestionFailure').on('hidden', function () {
+  // do something…
+   window.location.reload();
+});
+$('#myModal').on('hidden', function () {
+  // do something…
+   window.location.reload();
+});
     function cancel(argument){
+       event.preventDefault();
         $(argument).parent().parent().parent('div').hide();
-      $(argument).parent().parent().parent().siblings("[data='replybutton']").show();
+        $(argument).parent().parent().parent().siblings("[data='replybutton']").show();
     }
     function reply(argument){
       $(argument).siblings('div').show();
@@ -240,6 +225,10 @@ function pv_q(u, w, h){
             $("#QuestionFailure").modal('toggle');
           }
       })
+    }
+    function againChoosetoanswer(argument){
+      $(argument).siblings('div').show();
+      $(argument).hide();
     }
     function imageReply(argument){
       $(argument).parent().parent().siblings('form').children('.image').show();
@@ -264,11 +253,23 @@ function pv_q(u, w, h){
         var voice=$(this).children(".voice").children('[name="voice"]').val();
         var image=$(this).children(".image").children().children('[name="image"]').val();
         if(word==''&&voice==''&&image==''){
-          alert('至少输入一项');
+          $("#oneMore").modal('toggle');
             return;
         }
         else{
             $(this).siblings('[data="message"]').html();
+        }
+        if(voice!=''){
+         if(voice.match(/.wav|.mp3$/) == null){
+          alert('音频格式文件不对');
+          return ;
+         }
+        }
+        if(image!=''){
+          if(image.match(/.jpg|.png|.jpeg|.gif|.bmp$/) == null){
+            alert('图片格式不对！');
+            return;
+          }
         }
         window.useforChange = $(this);
        $(this).ajaxSubmit({
@@ -276,54 +277,13 @@ function pv_q(u, w, h){
            success:function(data){
               if(data.state=='success'){
                 $("#myModal").modal('toggle');
-                window.useforChange.parent().parent().parent().parent('li').remove();
-                var str = '';
-                $("#unsolveQuestion").css('display','block');
-                $("#unsolvePage").css('display','block');
-                str+='<li><div class="questionArea"><div class="questionContent">';
-                if(data.ques_image){
-                  str+='<img class="img-polaroid" style="width:100px;height:75px;float:right;" src='+data.ques_image+'/>';
-                }
-                if(data.content){
-                  str+='<p>'+data.content+'</p>';
-                }
-                str+='</div><div class="answer">';
-                if(data.answer){
-                  str+='<p>文字回复：</p><p>'+data.answer+'</p>';
-                }
-                if(data.answer_image){
-                  str+='<p>图片回复：</p><img src='+data.answer_image+'>';
-                }
-                if(data.answer_voice){
-                  str+='<p>语音回复：</p><audio src='+data.answer_voice+' controls></audio>';
-                }
-                str+='</div></div></li>';
-                $('#solveQuestion').append(str);
-                 $("#solvePage").jPages({
-                    containerID : "solveQuestion",
-                    first: '首页',
-                    last: '尾页',
-                    previous: '上页',
-                    next: '下页',
-                    perPage: 2,
-                });
-                $("#unSolvePage").jPages({
-                   containerID : "unsolveQuestion",
-                    first: '首页',
-                    last: '尾页',
-                    previous: '上页',
-                    next: '下页',
-                    perPage: 2,
-                })
-                $("#unsolveQuestion").css('display','none');
-                $("#unsolvePage").css('display','none');
-                window.location='/questions_teacher/';
               }
-              else
-                  alert('faild');
+              else if(data.state == 'wrong'){
+                $("#QuestionFailure").modal('toggle');
+              }
            },
            error:function(data){
-              alert('xcw432423');
+              $("#QuestionFailure").modal('toggle');
            }
        })
      })
@@ -376,6 +336,18 @@ function pv_q(u, w, h){
       $("#solveQuestion").hide();
       $('#unSolvePage').show();
       $('#solvePage').hide();
+    }
+    function decideSuffixImage(argument){
+      if($(argument).val().match(/.jpg|.png|.jpeg|.gif|.bmp$/)==null){
+        alert("请使用.jpg或.png或.jpeg或.gif或.bmp格式");
+        $(argument).val('');
+      }
+    }
+    function decideSuffixVoice(argument){
+      if($(argument).val().match(/.wav|.mp3$/)==null){
+        alert("请使用.wav或者.mp3格式");
+        $('argument').val('');
+      }
     }
 </script>
 </html>

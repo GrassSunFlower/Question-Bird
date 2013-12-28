@@ -1,0 +1,247 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>闻题鸟教师兑换积分</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <!-- Le styles -->
+    <link href="/site_media/css/bootstrap2.0.min.css" rel="stylesheet" />
+      <link href="/site_media/css/style.css" rel="stylesheet" />
+    <style type="text/css">
+        
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+    </style>
+    <link href="/site_media/css/bootstrap-responsive2.0.min.css" rel="stylesheet" />
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.bootcss.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png" />
+    <link rel="shortcut icon" href="../assets/ico/favicon.png" />
+    <script type="text/javascript" src="/site_media/js/jquery-2.0.2.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery.form.js"></script>
+</head>
+
+<body>        
+    <div class="header_full">
+        <div class="header">
+        <div class="twitter"><img src="/site_media/img/twitter.gif" width="38" height="35" border="0" alt="logo" />
+            <div class="btn-group pull-right">
+                <a class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">{{teacher.teachername}}<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/questions_teacher/">待解决问题</a></li>
+                    <li><a href='/questions_solved/'>已解决问题</a></li>
+                    <li><a href='/questions_unEvaluate/'>未满意问题</a></li>
+                    <li class="divider"></li>
+                    <li><a href="/logout_teacher/">登出</a></li>
+                </ul>
+            </div>
+        </div>     
+        <div class="clr"></div>
+            <div class="logo"><img src="/site_media/img/logo.png" width="216" height="72" border="0" alt="logo" /></div>
+            <div class="clr"></div>
+        </div> 
+    </div>
+
+    <form action='/exchange_teacher/' class="form-horizontal" method="post" id="exchangeForm">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3">
+                    <div class="container-fluid">
+                        <div class="span10 offset1">
+                            <h2 id="ShowAccount">{{teacher.teachername}}</h2>
+                            <a class="thumbnail">
+                                <img src="/site_media/img/avatar.png" class="img-rounded" id="ShowImage" />
+                                <h5 id="ShowPersonalNote"></h5>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="container-fluid" style="margin-top: 20px">
+                        <ul class="nav nav-list">
+                            <li class="nav-header">账户</li>
+                            <li><a href="#" id="Default"><i class="icon-user icon-white"></i>我的账户</a></li>
+                            <li class="active"><a href="#" id="Exchange">我要兑换</a></li>
+                        </ul>
+                    </div>
+                    <!--/.well -->
+                </div>
+
+                <!--/AccountSpan-->
+                <div class="span9" id="AccountSpan">
+                    <div class="hero-unit">
+                        <div class="row-fluid">
+                            <h3 id="WelcomeAccount">Hello, {{teacher.teachername}}! 您的积分剩余：{{teacher.wealth}}&nbsp;&nbsp;</h3>
+                            <div id="IsExchangeSucc" style="color: red; font-size: 9px">{{exchanged}}</div>
+                            <div class="">
+                                <input style="display:none" id="submittype" name="submittype" value="0" />
+                                <button type="submit" id="submit" style="display:none"></button>
+                                <ul class="thumbnails">
+                                    <li class="span4">
+                                        <div class="thumbnail">
+                                        <img data-src="holder.js/200x200" alt="200x200" style="width:200px; height:200px;" src="/site_media/img/50wealth.jpg"/>
+                                        <div class="caption">
+                                            <h3>50元充值卡</h3>
+                                            <p>需要50积分</p>
+                                            <p><a href="#" class="btn btn-primary" id="exchange50">兑换</a></p>
+                                        </div>
+                                    </li>
+                                    <li class="span4">
+                                        <div class="thumbnail">
+                                        <img data-src="holder.js/200x200" alt="200x200" style="width:200px; height:200px;" src="/site_media/img/100wealth.jpg"/>
+                                        <div class="caption">
+                                            <h3>100元充值卡</h3>
+                                            <p>需要100积分</p>
+                                            <p><a href="#" class="btn btn-primary" id="exchange100">兑换</a></p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+    <!--/.fluid-container-->
+
+    <div id="Success" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">兑换成功</h3>
+      </div>
+      <div class="modal-body">
+        <p>我们已经为您联系了系统管理员，请注意查收。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+      </div>
+    </div>
+    <div id="Failure" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">兑换失败</h3>
+      </div>
+      <div class="modal-body">
+        <p>不好意思，您的财富值不够，希望您继续努力。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+      </div>
+    </div>
+    <div id="Error" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">兑换失败</h3>
+      </div>
+      <div class="modal-body">
+        <p>不好意思，联系管理员失败，请检查您的网络并重试。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+      </div>
+    </div>
+    <!-- Footer
+    ================================================== -->
+    <footer class="footer">
+      <div class="container">
+        <p>Designed and built with all the love by <a href="http://www.renren.com/360196165" target="_blank">@Chaowei Xiao</a>, <a href="http://www.renren.com/320569263" target="_blank">@Huaiyi Huang</a>, <a href="http://www.renren.com/400722520" target="_blank">@Pengfei Chen</a>, <a href="http://www.renren.com/407789135" target="_blank">@Shiqian Zhang</a> and <a href="http://www.renren.com/272311905" target="_blank">@Shutong Zhang</a>.</p>
+      </div>
+    </footer>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/site_media/js/bootstrap.min.js"></script>
+
+    <a id="scrollUp" href="#top" title="" style="position: fixed; z-index: 2147483647; display: block;"></a>
+</body>
+<script type="text/javascript">
+var wealth = {{teacher.wealth}};
+
+$("#exchange50").click(function(e){
+    e.preventDefault();
+    if(wealth < 50){
+        $("#Failure").modal('toggle');
+        return;
+    }
+    $("#submittype").val('0');
+    $('form').ajaxSubmit({
+        success:function(data){
+            if(data.state == 'success'){
+                $("#Success").modal('toggle');
+                wealth -= 50;
+                $("#WelcomeAccount").text("Hello, {{teacher.teachername}}! 您的积分剩余："+wealth+"  ");
+            }
+            else if(data.state == 'error'){
+                $("#Error").modal('toggle');
+            }
+            else{
+                window.location='/login_teacher/';
+            }
+        }
+    });
+})
+
+$("#exchange100").click(function(e){
+    e.preventDefault();
+    if(wealth < 100){
+        $("#Failure").modal('toggle');
+        return;
+    }
+    $("#submittype").val('1');
+    $('form').ajaxSubmit({
+        success:function(data){
+            if(data.state == 'success'){
+                $("#Success").modal('toggle');
+                wealth -= 100;
+                $("#WelcomeAccount").text("Hello, {{teacher.teachername}}! 您的积分剩余："+wealth+"  ");
+            }
+            else if(data.state == 'error'){
+                $("#Error").modal('toggle');
+            }
+            else{
+                window.location='/login_teacher/';
+            }
+        }
+    });
+})
+
+$("#Default").click(function(e){
+    e.preventDefault();
+    window.location = '/profile_teacher/';
+})
+
+$("#main").click(function(e){
+    e.preventDefault();
+    window.location = '/questions_teacher/';
+})
+
+$("#logout").click(function(e){
+    e.preventDefault();
+    window.location = '/login_teacher/';
+})
+</script>
+</html>
